@@ -17,6 +17,7 @@ from api.ledger import router as ledger_router
 from api.aipi import router as aipi_router
 from api.status import router as status_router
 from api.disputes import router as disputes_router
+from api.admin import router as admin_router
 
 logger = setup_logging()
 
@@ -51,6 +52,9 @@ async def lifespan(app: FastAPI):
         f"Escrow: {chain_mode} | DisputeWindow: {DISPUTE_WINDOW_MINUTES}m | Logs: {LOG_DIR}"
     )
     logger.info("🚀 AXON Protocol server running")
+
+    from core.telegram_notifier import notify_server_start
+    await notify_server_start("Base mainnet" if BLOCKCHAIN_ENABLED else "simulated")
 
     yield
 
@@ -87,6 +91,7 @@ app.include_router(ledger_router,   prefix="/api/v1")
 app.include_router(aipi_router,     prefix="/api/v1")
 app.include_router(status_router,   prefix="/api/v1")
 app.include_router(disputes_router, prefix="/api/v1")
+app.include_router(admin_router,   prefix="/api/v1")
 
 
 @app.get("/")

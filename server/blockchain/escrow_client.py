@@ -215,6 +215,41 @@ class BlockchainEscrowClient:
             logger.error(f"refund_escrow on-chain failed: {e} — falling back to simulated")
             return self._sim("refund", escrow_id, error=str(e))
 
+    async def pause_contract(self) -> dict:
+        """Pause the escrow contract (emergency). Only protocol wallet."""
+        if not self.enabled:
+            return {"simulated": True, "action": "pause"}
+        try:
+            tx_hash = await self._send(self._contract.functions.pause())
+            receipt = await self._wait(tx_hash)
+            logger.warning(f"[EMERGENCY] Contract PAUSED | tx={tx_hash.hex()[:16]}...")
+            return {"simulated": False, "action": "pause", "tx_hash": tx_hash.hex()}
+        except Exception as e:
+            logger.error(f"pause_contract failed: {e}")
+            return {"simulated": True, "action": "pause", "error": str(e)}
+
+    async def unpause_contract(self) -> dict:
+        """Unpause the escrow contract. Only protocol wallet."""
+        if not self.enabled:
+            return {"simulated": True, "action": "unpause"}
+        try:
+            tx_hash = await self._send(self._contract.functions.unpause())
+            receipt = await self._wait(tx_hash)
+            logger.info(f"Contract UNPAUSED | tx={tx_hash.hex()[:16]}...")
+            return {"simulated": False, "action": "unpause", "tx_hash": tx_hash.hex()}
+        except Exception as e:
+            logger.error(f"unpause_contract failed: {e}")
+            return {"simulated": True, "action": "unpause", "error": str(e)}
+
+    async def is_paused(self) -> bool:
+        """Check if the contract is paused."""
+        if not self.enabled:
+            return False
+        try:
+            return await self._contract.functions.paused().call()
+        except Exception:
+            return False
+
     async def get_escrow_onchain(self, escrow_id: str) -> Optional[dict]:
         """Read escrow state directly from chain (None if not enabled or not found)."""
         if not self.enabled:

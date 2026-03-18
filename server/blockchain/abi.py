@@ -42,8 +42,29 @@ AXON_ESCROW_ABI = [
         "stateMutability": "nonpayable",
         "type": "function"
     },
+    {
+        "inputs": [],
+        "name": "pause",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "unpause",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
 
     # ── Read functions ───────────────────────────────────────────────────────
+    {
+        "inputs": [],
+        "name": "paused",
+        "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+        "stateMutability": "view",
+        "type": "function"
+    },
     {
         "inputs": [{"internalType": "bytes32", "name": "escrowId", "type": "bytes32"}],
         "name": "getEscrow",

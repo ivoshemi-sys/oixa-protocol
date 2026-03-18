@@ -141,6 +141,10 @@ async def open_dispute(body: DisputeOpen):
 
     await db.commit()
 
+    # ── Notify Ivan ───────────────────────────────────────────────────────────
+    from core.telegram_notifier import notify_dispute_opened
+    asyncio.create_task(notify_dispute_opened(dispute_id, body.auction_id, body.opened_by, fee_amount))
+
     # ── Trigger arbiter async (non-blocking) ──────────────────────────────────
     asyncio.create_task(_run_arbiter(dispute_id))
 

@@ -42,7 +42,12 @@ contract AXONEscrow {
     uint256 public totalCommissions;
     uint256 public totalRefunded;
 
+    // Emergency pause
+    bool public paused;
+
     // --- Events ---
+    event Paused(address indexed by);
+    event Unpaused(address indexed by);
     event EscrowCreated(
         bytes32 indexed escrowId,
         bytes32 indexed auctionId,
@@ -70,6 +75,7 @@ contract AXONEscrow {
     error OnlyProtocol();
     error TransferFailed();
     error InvalidAmount();
+    error ContractPaused();
 
     constructor(address _usdc, address _protocol) {
         require(_usdc    != address(0), "zero usdc");
@@ -81,6 +87,23 @@ contract AXONEscrow {
     modifier onlyProtocol() {
         if (msg.sender != protocol) revert OnlyProtocol();
         _;
+    }
+
+    modifier whenNotPaused() {
+        if (paused) revert ContractPaused();
+        _;
+    }
+
+    /// @notice Pause all escrow operations. Only protocol wallet.
+    function pause() external onlyProtocol {
+        paused = true;
+        emit Paused(msg.sender);
+    }
+
+    /// @notice Resume escrow operations. Only protocol wallet.
+    function unpause() external onlyProtocol {
+        paused = false;
+        emit Unpaused(msg.sender);
     }
 
     /**
@@ -98,7 +121,7 @@ contract AXONEscrow {
         address payee,
         uint256 amount,
         uint256 commission
-    ) external {
+    ) external whenNotPaused {
         if (escrows[escrowId].createdAt != 0) revert EscrowAlreadyExists();
         if (amount == 0)              revert InvalidAmount();
         if (commission >= amount)     revert InvalidAmount();
@@ -126,7 +149,7 @@ contract AXONEscrow {
      *         Net amount → payee. Commission → protocol wallet.
      *         Only callable by the protocol wallet.
      */
-    function release(bytes32 escrowId) external onlyProtocol {
+    function release(bytes32 escrowId) external onlyProtocol whenNotPaused {
         Escrow storage e = escrows[escrowId];
         if (e.createdAt == 0)           revert EscrowNotFound();
         if (e.status != Status.Active)  revert AlreadySettled();
@@ -150,7 +173,7 @@ contract AXONEscrow {
      * @notice Refund escrow to payer on failed/cancelled delivery.
      *         Only callable by the protocol wallet.
      */
-    function refund(bytes32 escrowId) external onlyProtocol {
+    function refund(bytes32 escrowId) external onlyProtocol whenNotPaused {
         Escrow storage e = escrows[escrowId];
         if (e.createdAt == 0)           revert EscrowNotFound();
         if (e.status != Status.Active)  revert AlreadySettled();

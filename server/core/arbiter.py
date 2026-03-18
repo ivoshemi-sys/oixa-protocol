@@ -202,6 +202,10 @@ async def arbitrate_dispute(dispute_id: str) -> dict:
     await db.commit()
 
     logger.info(f"[ARBITER] Dispute {dispute_id} resolved: {result_status}")
+
+    from core.telegram_notifier import notify_dispute_resolved
+    await notify_dispute_resolved(dispute_id, verdict, float(verdict_data.get("confidence", 0.0)))
+
     return {"verdict": verdict, "verdict_data": verdict_data, "arbiter_cost_usdc": arbiter_cost_usdc}
 
 

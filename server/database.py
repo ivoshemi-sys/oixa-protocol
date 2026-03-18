@@ -313,6 +313,15 @@ CREATE TABLE IF NOT EXISTS disputes (
     created_at TEXT NOT NULL,
     resolved_at TEXT,
     FOREIGN KEY (auction_id) REFERENCES auctions(id)
+);
+
+CREATE TABLE IF NOT EXISTS daily_spending (
+    id TEXT PRIMARY KEY,
+    date TEXT NOT NULL,                -- YYYY-MM-DD in UTC
+    amount REAL NOT NULL,
+    auction_id TEXT,
+    description TEXT,
+    created_at TEXT NOT NULL
 )
 """
 

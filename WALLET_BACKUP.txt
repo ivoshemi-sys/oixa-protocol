@@ -1,0 +1,61 @@
+╔══════════════════════════════════════════════════════════════════════╗
+║           AXON PROTOCOL — WALLET BACKUP INSTRUCTIONS                ║
+╚══════════════════════════════════════════════════════════════════════╝
+
+PROTOCOL WALLET (BASE MAINNET)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Public address: 0xB44c6f4b16aE4EAeAe76d7E9c3D269B3824ffa86
+Network:        Base mainnet (chain ID 8453)
+Role:           Protocol wallet — receives commissions, controls escrow
+
+WHERE IS THE PRIVATE KEY?
+━━━━━━━━━━━━━━━━━━━━━━━━━
+The private key is stored in: axon-protocol/.env
+Variable name:  PROTOCOL_PRIVATE_KEY
+This file is gitignored and NEVER committed to GitHub.
+
+SECURE BACKUP CHECKLIST (do this NOW)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[ ] 1. Open .env and find PROTOCOL_PRIVATE_KEY=0x...
+[ ] 2. Write down the 64-character hex key on paper (offline)
+[ ] 3. Store the paper in a physically secure location (safe, etc.)
+[ ] 4. Consider a hardware wallet (Ledger/Trezor) for production
+[ ] 5. Import into a second secure location:
+       - Password manager (Bitwarden, 1Password) with strong master pass
+       - Encrypted USB drive stored offline
+[ ] 6. NEVER share the private key via email, Telegram, or any digital channel
+[ ] 7. Test recovery: import key into MetaMask (testnet only) to verify it works
+
+WHAT THIS WALLET CONTROLS
+━━━━━━━━━━━━━━━━━━━━━━━━━
+- AXONEscrow contract: only this wallet can release/refund escrows
+- Protocol commissions: all revenue flows here
+- Emergency pause: only this wallet can pause the contract
+- Safe multisig: this is the primary signer
+
+FUND THIS WALLET
+━━━━━━━━━━━━━━━━
+1. Send ETH (Base) for gas: minimum 0.01 ETH recommended
+   → bridge via https://bridge.base.org
+2. Optionally send initial USDC for testing
+
+SAFE MULTISIG SETUP
+━━━━━━━━━━━━━━━━━━━
+Once funded, deploy a Safe:
+  cd axon-protocol/server
+  python -m blockchain.safe_setup deploy
+
+Or via the API (once server is running):
+  POST http://localhost:8000/api/v1/admin/setup-safe
+
+RECOVERY
+━━━━━━━━
+If this Mac is lost:
+1. Obtain the private key from your secure backup
+2. Import into any EVM-compatible wallet (MetaMask, Rabby, etc.)
+3. Update PROTOCOL_PRIVATE_KEY in .env on the new machine
+4. The contract address (ESCROW_CONTRACT_ADDRESS) is unchanged
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Generated: 2026-03-18 | AXON Protocol v0.1.0 | Ivan Shemi
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

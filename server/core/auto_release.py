@@ -183,3 +183,6 @@ async def _do_release(db, row: dict, now: str):
         )
 
     await db.commit()
+
+    from core.telegram_notifier import notify_payment_released
+    await notify_payment_released(auction_id, row["amount"], row["payee_id"], commission)

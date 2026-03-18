@@ -8,7 +8,7 @@ AXON_PORT = int(os.getenv("AXON_PORT", "8000"))
 AXON_DEBUG = os.getenv("AXON_DEBUG", "true").lower() == "true"
 OPENCLAW_URL = os.getenv("OPENCLAW_URL", "ws://127.0.0.1:18789")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
-TELEGRAM_OWNER_ID = int(os.getenv("TELEGRAM_OWNER_ID", "0"))
+TELEGRAM_OWNER_ID = int(os.getenv("TELEGRAM_OWNER_ID", "0") or "0")
 DB_PATH = os.getenv("DB_PATH", "./axon.db")
 DATABASE_URL = os.getenv("DATABASE_URL", "")  # postgresql://user:pass@host:5432/db
 COMMISSION_RATE = float(os.getenv("COMMISSION_RATE", "0.05"))
@@ -28,6 +28,10 @@ PROTOCOL_PRIVATE_KEY      = os.getenv("PROTOCOL_PRIVATE_KEY", "")
 ESCROW_CONTRACT_ADDRESS   = os.getenv("ESCROW_CONTRACT_ADDRESS", "")
 # Derived flag: True when all three blockchain vars are present
 BLOCKCHAIN_ENABLED = bool(BASE_RPC_URL and PROTOCOL_PRIVATE_KEY and ESCROW_CONTRACT_ADDRESS)
+SAFE_ADDRESS              = os.getenv("SAFE_ADDRESS", "")
+
+# ── Daily spending limit ─────────────────────────────────────────────────────
+DAILY_LIMIT_USD = float(os.getenv("DAILY_LIMIT_USD", "50.0"))
 
 # ── Dispute system ───────────────────────────────────────────────────────────
 DISPUTE_WINDOW_MINUTES = int(os.getenv("DISPUTE_WINDOW_MINUTES", "10"))

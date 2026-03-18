@@ -103,6 +103,17 @@ async def close_auction(auction_id: str) -> dict:
         commission = calculate_commission(winning_bid)
         escrow_id  = f"axon_escrow_{uuid.uuid4().hex[:12]}"
 
+        # ── Daily spending limit check ────────────────────────────────────────
+        from core.daily_limit import check_limit, record_spending
+        try:
+            await check_limit(winning_bid, db)
+        except ValueError as e:
+            logger.warning(f"Daily limit hit — cancelling auction {auction_id}: {e}")
+            await db.execute("UPDATE auctions SET status = 'cancelled' WHERE id = ?", (auction_id,))
+            await db.commit()
+            return {"success": False, "error": str(e), "auction_id": auction_id}
+        await record_spending(winning_bid, auction_id, f"Escrow for auction {auction_id}", db)
+
         # ── DB escrow record (always) ─────────────────────────────────────────
         await db.execute(
             """INSERT INTO escrows
@@ -157,6 +168,9 @@ async def close_auction(auction_id: str) -> dict:
             pass
         except Exception as e:
             logger.error(f"Blockchain escrow creation error: {e}")
+
+        from core.telegram_notifier import notify_escrow_created
+        await notify_escrow_created(auction_id, winning_bid, winner_id)
 
         from core.openclaw import openclaw_client
         await openclaw_client.broadcast(
