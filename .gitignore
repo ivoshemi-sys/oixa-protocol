@@ -5,3 +5,4 @@ __pycache__/
 .env
 axon.pid
 server/axon.db
+*.log
