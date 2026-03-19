@@ -6,31 +6,33 @@
 
 ---
 
-## ✅ PyPI Package — Built and Ready to Upload
+## 🔨 PyPI Package — Built, Awaiting Token to Upload
 
 **Package:** `oixa-protocol 0.1.0`
-**Artifacts (both passing `twine check`):**
-- `packages/oixa-protocol/dist/oixa_protocol-0.1.0-py3-none-any.whl` (53 KB)
-- `packages/oixa-protocol/dist/oixa_protocol-0.1.0.tar.gz` (41 KB)
+**Artifacts built and verified (`twine check` PASSED):**
+- `packages/oixa-protocol/dist/oixa_protocol-0.1.0-py3-none-any.whl` (54 KB)
+- `packages/oixa-protocol/dist/oixa_protocol-0.1.0.tar.gz` (42 KB)
 
-**To publish (one command, needs PyPI token):**
+**Upload is one command — paste your PyPI token and run:**
 ```bash
-# 1. Get token: https://pypi.org/manage/account/token/ → "Add API token" → scope: "Entire account"
-# 2. Upload:
 cd /Users/Openclaw/oixa-protocol/packages/oixa-protocol
-TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-YOUR_TOKEN_HERE python3 -m twine upload dist/*
+TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-PASTE_TOKEN_HERE python3 -m twine upload dist/*
 ```
+
+**Get token:** https://pypi.org/manage/account/token/
+→ "Add API token" → name: `oixa-protocol` → scope: "Entire account" → Copy token (starts with `pypi-`)
 
 **After publish, agents install via:**
 ```bash
-pip install oixa-protocol                  # core
+pip install oixa-protocol                  # core (httpx only)
 pip install oixa-protocol[langchain]       # + LangChain toolkit
 pip install oixa-protocol[crewai]          # + CrewAI tools
 pip install oixa-protocol[autogen]         # + AutoGen functions
+pip install oixa-protocol[haystack]        # + Haystack components
 pip install oixa-protocol[all]             # everything
 ```
 
-**Blocker:** PyPI API token — generate at https://pypi.org/manage/account/token/
+**Blocker:** PyPI API token only — everything else is done.
 
 ---
 
@@ -138,9 +140,11 @@ echo "from .oixa_protocol import *" >> __init__.py
 
 **What:** Register OIXA as a ChatGPT Action so any GPT can hire agents and earn USDC.
 
-**Both endpoints verified live ✅:**
+**Both endpoints verified live ✅ (re-verified 2026-03-19):**
 - Plugin manifest: http://64.23.235.34:8000/.well-known/ai-plugin.json
-- OpenAPI spec: http://64.23.235.34:8000/openapi.json (93 endpoints, servers block set)
+  → `name: OIXA Protocol` | `auth: none` | `api: http://64.23.235.34:8000/openapi.json`
+- OpenAPI spec: http://64.23.235.34:8000/openapi.json
+  → `title: OIXA Protocol` | `93 endpoints` | `servers: ["http://64.23.235.34:8000"]`
 
 **Exact steps:**
 1. Go to https://chatgpt.com → top-left menu → **My GPTs** → **Create a GPT**
