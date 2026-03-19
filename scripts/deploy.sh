@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────────
-# AXON Protocol — Production deploy to Ubuntu 24.04 VPS
+# VELUN Protocol — Production deploy to Ubuntu 24.04 VPS
 # Usage:  bash scripts/deploy.sh [server_ip] [ssh_user]
 # Default: bash scripts/deploy.sh 64.23.235.34 root
 # ─────────────────────────────────────────────────────────────────────────────
@@ -9,14 +9,14 @@ set -euo pipefail
 # ── Config ────────────────────────────────────────────────────────────────────
 SERVER_IP="${1:-64.23.235.34}"
 SSH_USER="${2:-root}"
-REPO="https://github.com/ivoshemi-sys/axon-protocol.git"
-DEPLOY_DIR="/opt/axon-protocol"
-SERVICE_NAME="axon-protocol"
+REPO="https://github.com/ivoshemi-sys/velun-protocol.git"
+DEPLOY_DIR="/opt/velun-protocol"
+SERVICE_NAME="velun-protocol"
 LOCAL_ENV="$(dirname "$0")/../.env"
 
 # ── Pre-flight checks ─────────────────────────────────────────────────────────
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo " AXON Protocol — Deploy to $SSH_USER@$SERVER_IP"
+echo " VELUN Protocol — Deploy to $SSH_USER@$SERVER_IP"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 if [ ! -f "$LOCAL_ENV" ]; then
@@ -67,9 +67,9 @@ if [ -d "$DEPLOY_DIR/.git" ]; then
     echo "  repo updated ✅"
 else
     # .env was already copied — preserve it
-    mv $DEPLOY_DIR/.env /tmp/axon_env_backup 2>/dev/null || true
+    mv $DEPLOY_DIR/.env /tmp/velun_env_backup 2>/dev/null || true
     git clone --quiet $REPO $DEPLOY_DIR
-    mv /tmp/axon_env_backup $DEPLOY_DIR/.env 2>/dev/null || true
+    mv /tmp/velun_env_backup $DEPLOY_DIR/.env 2>/dev/null || true
     echo "  repo cloned ✅"
 fi
 cd $DEPLOY_DIR
@@ -91,21 +91,21 @@ echo ""
 echo "── 5/6  systemd service ──────────────────────────────"
 cat > /etc/systemd/system/${SERVICE_NAME}.service << 'UNIT'
 [Unit]
-Description=AXON Protocol Server
+Description=VELUN Protocol Server
 After=network.target
 Wants=network-online.target
 
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/axon-protocol/server
-Environment=PATH=/opt/axon-protocol/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
-EnvironmentFile=/opt/axon-protocol/.env
-ExecStart=/opt/axon-protocol/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --workers 1
+WorkingDirectory=/opt/velun-protocol/server
+Environment=PATH=/opt/velun-protocol/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+EnvironmentFile=/opt/velun-protocol/.env
+ExecStart=/opt/velun-protocol/venv/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --workers 1
 Restart=always
 RestartSec=5
-StandardOutput=append:/opt/axon-protocol/logs/axon.log
-StandardError=append:/opt/axon-protocol/logs/axon.log
+StandardOutput=append:/opt/velun-protocol/logs/velun.log
+StandardError=append:/opt/velun-protocol/logs/velun.log
 
 [Install]
 WantedBy=multi-user.target
@@ -124,7 +124,7 @@ ufw default allow outgoing > /dev/null 2>&1
 ufw allow 22/tcp  > /dev/null 2>&1   # SSH
 ufw allow 80/tcp  > /dev/null 2>&1   # HTTP
 ufw allow 443/tcp > /dev/null 2>&1   # HTTPS
-ufw allow 8000/tcp > /dev/null 2>&1  # AXON API
+ufw allow 8000/tcp > /dev/null 2>&1  # VELUN API
 ufw --force enable > /dev/null 2>&1
 echo "  firewall ✅  (22, 80, 443, 8000 open)"
 
@@ -155,8 +155,8 @@ echo " Docs:  http://$SERVER_IP:8000/docs"
 echo " Health: http://$SERVER_IP:8000/health"
 echo ""
 echo " Comandos útiles:"
-echo "   ssh $SSH_USER@$SERVER_IP 'systemctl status axon-protocol'"
-echo "   ssh $SSH_USER@$SERVER_IP 'journalctl -u axon-protocol -f'"
-echo "   ssh $SSH_USER@$SERVER_IP 'tail -f /opt/axon-protocol/logs/axon.log'"
-echo "   ssh $SSH_USER@$SERVER_IP 'systemctl restart axon-protocol'"
+echo "   ssh $SSH_USER@$SERVER_IP 'systemctl status velun-protocol'"
+echo "   ssh $SSH_USER@$SERVER_IP 'journalctl -u velun-protocol -f'"
+echo "   ssh $SSH_USER@$SERVER_IP 'tail -f /opt/velun-protocol/logs/velun.log'"
+echo "   ssh $SSH_USER@$SERVER_IP 'systemctl restart velun-protocol'"
 echo ""

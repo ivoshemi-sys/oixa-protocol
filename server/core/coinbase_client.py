@@ -1,5 +1,5 @@
 """
-Coinbase Commerce client for AXON Protocol.
+Coinbase Commerce client for VELUN Protocol.
 
 Creates hosted payment pages that accept USDC across multiple networks.
 Coinbase Commerce handles chain detection automatically.
@@ -16,7 +16,7 @@ import httpx
 
 from config import COINBASE_COMMERCE_API_KEY, COINBASE_COMMERCE_WEBHOOK_SECRET
 
-logger = logging.getLogger("axon.coinbase")
+logger = logging.getLogger("velun.coinbase")
 
 COMMERCE_BASE_URL = "https://api.commerce.coinbase.com"
 COMMERCE_API_VERSION = "2018-03-22"

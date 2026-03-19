@@ -5,39 +5,39 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: axon
-      POSTGRES_USER: axon
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-axon_secret}
+      POSTGRES_DB: velun
+      POSTGRES_USER: velun
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-velun_secret}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U axon"]
+      test: ["CMD-SHELL", "pg_isready -U velun"]
       interval: 5s
       timeout: 5s
       retries: 5
 
-  axon:
+  velun:
     build: .
     restart: unless-stopped
     ports:
-      - "${AXON_PORT:-8000}:8000"
+      - "${VELUN_PORT:-8000}:8000"
     environment:
-      - AXON_HOST=0.0.0.0
-      - AXON_PORT=8000
-      - AXON_DEBUG=${AXON_DEBUG:-false}
+      - VELUN_HOST=0.0.0.0
+      - VELUN_PORT=8000
+      - VELUN_DEBUG=${VELUN_DEBUG:-false}
       - OPENCLAW_URL=${OPENCLAW_URL:-ws://127.0.0.1:18789}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
       - TELEGRAM_OWNER_ID=${TELEGRAM_OWNER_ID:-0}
-      - DATABASE_URL=postgresql://axon:${POSTGRES_PASSWORD:-axon_secret}@postgres:5432/axon
+      - DATABASE_URL=postgresql://velun:${POSTGRES_PASSWORD:-velun_secret}@postgres:5432/velun
       - COMMISSION_RATE=${COMMISSION_RATE:-0.05}
       - MAX_REQUESTS_PER_MINUTE=${MAX_REQUESTS_PER_MINUTE:-50}
       - STAKE_PERCENTAGE=${STAKE_PERCENTAGE:-0.20}
       - PROTOCOL_WALLET=${PROTOCOL_WALLET:-}
       - PROTOCOL_WALLET_NETWORK=${PROTOCOL_WALLET_NETWORK:-base}
-      - LOG_DIR=/var/log/axon
+      - LOG_DIR=/var/log/velun
     volumes:
-      - axon_logs:/var/log/axon
-      - axon_db:/app/data
+      - velun_logs:/var/log/velun
+      - velun_db:/app/data
     depends_on:
       postgres:
         condition: service_healthy
@@ -49,11 +49,11 @@ services:
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN:-}
     depends_on:
-      - axon
+      - velun
     profiles:
       - tunnel
 
 volumes:
   postgres_data:
-  axon_logs:
-  axon_db:
+  velun_logs:
+  velun_db:

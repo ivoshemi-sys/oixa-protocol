@@ -1,5 +1,5 @@
 """
-Stripe client wrapper for AXON Protocol.
+Stripe client wrapper for VELUN Protocol.
 Handles Crypto Onramp sessions and Issuing (virtual cards).
 Falls back gracefully when STRIPE_SECRET_KEY is not configured.
 """

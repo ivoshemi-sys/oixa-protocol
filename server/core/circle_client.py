@@ -1,5 +1,5 @@
 """
-Circle Payments API client for AXON Protocol.
+Circle Payments API client for VELUN Protocol.
 
 Handles institutional USDC payments via Circle's API:
   - Payment intents (request USDC from a payer's Circle wallet)
@@ -18,7 +18,7 @@ import httpx
 
 from config import CIRCLE_API_KEY, CIRCLE_API_URL
 
-logger = logging.getLogger("axon.circle")
+logger = logging.getLogger("velun.circle")
 
 ENABLED = bool(CIRCLE_API_KEY)
 

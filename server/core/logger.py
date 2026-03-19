@@ -1,6 +1,6 @@
 """
-Persistent logging setup for AXON Protocol.
-Writes to LOG_DIR/axon.log (rotating, 10MB max, 5 backups).
+Persistent logging setup for VELUN Protocol.
+Writes to LOG_DIR/velun.log (rotating, 10MB max, 5 backups).
 Also outputs to console via rich.
 """
 
@@ -11,15 +11,15 @@ import sys
 from pathlib import Path
 
 from rich.logging import RichHandler
-from config import LOG_DIR, AXON_DEBUG
+from config import LOG_DIR, VELUN_DEBUG
 
 
 def setup_logging():
     log_dir = Path(LOG_DIR)
     log_dir.mkdir(parents=True, exist_ok=True)
-    log_file = log_dir / "axon.log"
+    log_file = log_dir / "velun.log"
 
-    level = logging.DEBUG if AXON_DEBUG else logging.INFO
+    level = logging.DEBUG if VELUN_DEBUG else logging.INFO
 
     root = logging.getLogger()
     root.setLevel(level)
@@ -31,7 +31,7 @@ def setup_logging():
     console_handler = RichHandler(
         rich_tracebacks=True,
         show_time=True,
-        show_path=AXON_DEBUG,
+        show_path=VELUN_DEBUG,
     )
     console_handler.setLevel(level)
     root.addHandler(console_handler)
@@ -56,6 +56,6 @@ def setup_logging():
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("websockets").setLevel(logging.WARNING)
 
-    logger = logging.getLogger("axon")
+    logger = logging.getLogger("velun")
     logger.info(f"Logging initialized — log file: {log_file}")
     return logger

@@ -1,5 +1,5 @@
 """
-Circle CCTP v2 (Cross-Chain Transfer Protocol) client for AXON Protocol.
+Circle CCTP v2 (Cross-Chain Transfer Protocol) client for VELUN Protocol.
 
 Allows receiving USDC from Ethereum, Arbitrum, Avalanche, Polygon → Base mainnet.
 
@@ -7,7 +7,7 @@ Flow (as receiver on Base):
   1. Agent/user calls depositForBurn on source chain → provides us the tx hash
   2. We extract MessageSent event → compute message hash
   3. We poll Circle Iris Attestation API until status="signed"
-  4. We call receiveMessage on Base MessageTransmitter → USDC lands in AXON wallet
+  4. We call receiveMessage on Base MessageTransmitter → USDC lands in VELUN wallet
 
 CCTP V2 contracts use the same address on all supported EVM chains:
   TokenMessenger V2:    0x28b5a0e9c621a5badaa536219b3a228c8168cf5d
@@ -31,7 +31,7 @@ from config import (
     PROTOCOL_WALLET,
 )
 
-logger = logging.getLogger("axon.cctp")
+logger = logging.getLogger("velun.cctp")
 
 # ── Chain registry ────────────────────────────────────────────────────────────
 
@@ -75,7 +75,7 @@ CHAINS: dict[str, dict] = {
     },
 }
 
-BASE_DOMAIN = 6  # AXON always receives on Base
+BASE_DOMAIN = 6  # VELUN always receives on Base
 
 # ── ABIs ─────────────────────────────────────────────────────────────────────
 

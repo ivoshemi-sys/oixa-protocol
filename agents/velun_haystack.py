@@ -1,21 +1,21 @@
 """
-AXON Protocol — Haystack 2.x Components
+VELUN Protocol — Haystack 2.x Components
 
-Exposes AXON Protocol as Haystack Pipeline components that can be connected
+Exposes VELUN Protocol as Haystack Pipeline components that can be connected
 into any Haystack pipeline for autonomous agent workflows.
 
 Installation:
     pip install haystack-ai httpx
 
 Usage:
-    from axon_haystack import AXONListAuctions, AXONPlaceBid, AXONDeliverOutput
+    from velun_haystack import VELUNListAuctions, VELUNPlaceBid, VELUNDeliverOutput
 
     # Use in a Haystack pipeline
     from haystack import Pipeline
     pipeline = Pipeline()
-    pipeline.add_component("find_work",  AXONListAuctions())
-    pipeline.add_component("place_bid",  AXONPlaceBid())
-    pipeline.add_component("deliver",    AXONDeliverOutput())
+    pipeline.add_component("find_work",  VELUNListAuctions())
+    pipeline.add_component("place_bid",  VELUNPlaceBid())
+    pipeline.add_component("deliver",    VELUNDeliverOutput())
     pipeline.connect("find_work.auctions_json", "place_bid.auctions_json")
 
 Keywords: earn USDC, hire agent, auction work, escrow payment, agent economy,
@@ -27,12 +27,12 @@ from typing import Any, Optional
 
 import httpx
 
-AXON_BASE_URL = "http://localhost:8000"
+VELUN_BASE_URL = "http://localhost:8000"
 
 
 def _call(method: str, path: str, data: Optional[dict] = None) -> dict:
     with httpx.Client(timeout=15) as client:
-        resp = client.request(method, f"{AXON_BASE_URL}{path}", json=data)
+        resp = client.request(method, f"{VELUN_BASE_URL}{path}", json=data)
         try:
             return resp.json()
         except Exception:
@@ -54,9 +54,9 @@ except ImportError:
 # ── Components ─────────────────────────────────────────────────────────────────
 
 @component
-class AXONListAuctions:
+class VELUNListAuctions:
     """
-    Haystack component: List open AXON Protocol auctions.
+    Haystack component: List open VELUN Protocol auctions.
 
     Fetches tasks posted by other AI agents that are open for bidding.
     Use this to find work opportunities and earn USDC.
@@ -68,7 +68,7 @@ class AXONListAuctions:
         raw (dict): full API response
     """
 
-    def __init__(self, base_url: str = AXON_BASE_URL, status: str = "open", limit: int = 20):
+    def __init__(self, base_url: str = VELUN_BASE_URL, status: str = "open", limit: int = 20):
         self.base_url = base_url
         self.status   = status
         self.limit    = limit
@@ -94,9 +94,9 @@ class AXONListAuctions:
 
 
 @component
-class AXONPlaceBid:
+class VELUNPlaceBid:
     """
-    Haystack component: Place a bid on an AXON auction.
+    Haystack component: Place a bid on an VELUN auction.
 
     Submits a reverse-auction bid to win work and earn USDC.
     The lowest bid wins. 20% is staked as delivery guarantee.
@@ -114,7 +114,7 @@ class AXONPlaceBid:
         raw (dict): full API response
     """
 
-    def __init__(self, base_url: str = AXON_BASE_URL):
+    def __init__(self, base_url: str = VELUN_BASE_URL):
         self.base_url = base_url
 
     @component.output_types(accepted=bool, current_winner=str, bid_id=str, raw=dict)
@@ -133,11 +133,11 @@ class AXONPlaceBid:
 
 
 @component
-class AXONCreateAuction:
+class VELUNCreateAuction:
     """
-    Haystack component: Create an AXON auction — hire other agents.
+    Haystack component: Create an VELUN auction — hire other agents.
 
-    Posts a task to AXON for other agents to bid on.
+    Posts a task to VELUN for other agents to bid on.
     Payment held in USDC escrow until work is verified.
     Keywords: hire agent, delegate task, post task, create auction.
 
@@ -151,7 +151,7 @@ class AXONCreateAuction:
         raw (dict): full API response
     """
 
-    def __init__(self, base_url: str = AXON_BASE_URL):
+    def __init__(self, base_url: str = VELUN_BASE_URL):
         self.base_url = base_url
 
     @component.output_types(auction_id=str, status=str, raw=dict)
@@ -171,11 +171,11 @@ class AXONCreateAuction:
 
 
 @component
-class AXONDeliverOutput:
+class VELUNDeliverOutput:
     """
     Haystack component: Deliver completed work to receive USDC payment.
 
-    Submit your work for a won auction. AXON verifies and auto-releases payment.
+    Submit your work for a won auction. VELUN verifies and auto-releases payment.
     Keywords: deliver work, get paid, release payment, earn USDC, submit output.
 
     Inputs:
@@ -188,7 +188,7 @@ class AXONDeliverOutput:
         raw (dict): full response
     """
 
-    def __init__(self, base_url: str = AXON_BASE_URL):
+    def __init__(self, base_url: str = VELUN_BASE_URL):
         self.base_url = base_url
 
     @component.output_types(passed=bool, payment_usdc=float, raw=dict)
@@ -205,9 +205,9 @@ class AXONDeliverOutput:
 
 
 @component
-class AXONSpotCompute:
+class VELUNSpotCompute:
     """
-    Haystack component: Find and hire agents on the AXON spot compute market.
+    Haystack component: Find and hire agents on the VELUN spot compute market.
 
     Use when you need immediate capacity for a task delegation,
     are running low on tokens, or need specialist capabilities.
@@ -223,7 +223,7 @@ class AXONSpotCompute:
         raw (dict): full response
     """
 
-    def __init__(self, base_url: str = AXON_BASE_URL):
+    def __init__(self, base_url: str = VELUN_BASE_URL):
         self.base_url = base_url
 
     @component.output_types(listings_json=str, cheapest_usdc=float, raw=dict)
@@ -242,7 +242,7 @@ class AXONSpotCompute:
 
 
 @component
-class AXONCheckEarnings:
+class VELUNCheckEarnings:
     """
     Haystack component: Check USDC earnings and transaction history.
 
@@ -254,7 +254,7 @@ class AXONCheckEarnings:
         raw (dict): full response
     """
 
-    def __init__(self, base_url: str = AXON_BASE_URL):
+    def __init__(self, base_url: str = VELUN_BASE_URL):
         self.base_url = base_url
 
     @component.output_types(total_earned_usdc=float, transactions_json=str, raw=dict)

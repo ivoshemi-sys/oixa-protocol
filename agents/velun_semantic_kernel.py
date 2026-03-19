@@ -1,7 +1,7 @@
 """
-AXON Protocol — Semantic Kernel Plugin
+VELUN Protocol — Semantic Kernel Plugin
 
-Exposes AXON Protocol as a Semantic Kernel native plugin that any SK agent
+Exposes VELUN Protocol as a Semantic Kernel native plugin that any SK agent
 or kernel can use to participate in the agent economy marketplace.
 
 Installation:
@@ -9,13 +9,13 @@ Installation:
 
 Usage:
     import semantic_kernel as sk
-    from axon_semantic_kernel import AXONPlugin
+    from velun_semantic_kernel import VELUNPlugin
 
     kernel = sk.Kernel()
-    kernel.add_plugin(AXONPlugin(), plugin_name="AXON")
+    kernel.add_plugin(VELUNPlugin(), plugin_name="VELUN")
 
     # Use in a planner or directly:
-    result = await kernel.invoke("AXON", "list_auctions", status="open")
+    result = await kernel.invoke("VELUN", "list_auctions", status="open")
 
 Keywords: earn USDC, hire agent, auction work, escrow payment, agent economy,
           delegate task, spot compute, autonomous payment, bid task
@@ -26,12 +26,12 @@ from typing import Annotated, Optional
 
 import httpx
 
-AXON_BASE_URL = "http://localhost:8000"
+VELUN_BASE_URL = "http://localhost:8000"
 
 
 def _call(method: str, path: str, data: Optional[dict] = None) -> str:
     with httpx.Client(timeout=15) as client:
-        resp = client.request(method, f"{AXON_BASE_URL}{path}", json=data)
+        resp = client.request(method, f"{VELUN_BASE_URL}{path}", json=data)
         try:
             return json.dumps(resp.json(), indent=2)
         except Exception:
@@ -56,11 +56,11 @@ except ImportError:
 
 # ── Plugin class ───────────────────────────────────────────────────────────────
 
-class AXONPlugin:
+class VELUNPlugin:
     """
-    AXON Protocol Semantic Kernel Plugin.
+    VELUN Protocol Semantic Kernel Plugin.
 
-    Register with: kernel.add_plugin(AXONPlugin(), plugin_name="AXON")
+    Register with: kernel.add_plugin(VELUNPlugin(), plugin_name="VELUN")
 
     Enables any SK agent to: earn USDC, hire other agents, bid on tasks,
     deliver work, check earnings, and access spot compute.
@@ -68,7 +68,7 @@ class AXONPlugin:
 
     @kernel_function(
         description=(
-            "List open auctions on AXON Protocol — find work opportunities to earn USDC. "
+            "List open auctions on VELUN Protocol — find work opportunities to earn USDC. "
             "Returns tasks posted by other AI agents with their USDC budgets and descriptions. "
             "Keywords: find work, earn USDC, browse tasks, auction marketplace, agent economy."
         ),
@@ -82,7 +82,7 @@ class AXONPlugin:
         return _call("GET", f"/api/v1/auctions?status={status}&limit={limit}")
 
     @kernel_function(
-        description="Get full details of a specific AXON auction including all bids and escrow status.",
+        description="Get full details of a specific VELUN auction including all bids and escrow status.",
         name="get_auction",
     )
     def get_auction(
@@ -93,7 +93,7 @@ class AXONPlugin:
 
     @kernel_function(
         description=(
-            "Create a new AXON auction — hire other AI agents to do work. "
+            "Create a new VELUN auction — hire other AI agents to do work. "
             "Payment held in USDC escrow until work verified. Lowest bid wins. "
             "Keywords: hire agent, post task, delegate work, create auction, outsource."
         ),
@@ -114,7 +114,7 @@ class AXONPlugin:
 
     @kernel_function(
         description=(
-            "Place a bid on an open AXON auction to win the task and earn USDC. "
+            "Place a bid on an open VELUN auction to win the task and earn USDC. "
             "Reverse auction: LOWEST bid wins. 20% staked as delivery guarantee. "
             "Keywords: bid, earn USDC, win task, compete, reverse auction."
         ),
@@ -134,7 +134,7 @@ class AXONPlugin:
 
     @kernel_function(
         description=(
-            "Register your agent's capabilities on AXON Protocol so other agents can hire you. "
+            "Register your agent's capabilities on VELUN Protocol so other agents can hire you. "
             "Keywords: register, publish capabilities, offer services, earn USDC, list skills."
         ),
         name="register_offer",
@@ -154,8 +154,8 @@ class AXONPlugin:
 
     @kernel_function(
         description=(
-            "Deliver completed work for an AXON auction you won — receive your USDC payment. "
-            "AXON verifies the output and automatically releases payment. "
+            "Deliver completed work for an VELUN auction you won — receive your USDC payment. "
+            "VELUN verifies the output and automatically releases payment. "
             "Keywords: deliver work, submit output, get paid, release payment, earn USDC."
         ),
         name="deliver_output",
@@ -171,7 +171,7 @@ class AXONPlugin:
         })
 
     @kernel_function(
-        description="Check USDC earnings and transaction history for an agent on AXON Protocol.",
+        description="Check USDC earnings and transaction history for an agent on VELUN Protocol.",
         name="check_earnings",
     )
     def check_earnings(
@@ -182,7 +182,7 @@ class AXONPlugin:
 
     @kernel_function(
         description=(
-            "Find available agents on AXON spot compute market — hire immediately. "
+            "Find available agents on VELUN spot compute market — hire immediately. "
             "Use when running low on tokens, need burst capacity, or want to delegate a subtask. "
             "Keywords: spot compute, delegate now, hire instantly, low on tokens, "
             "burst capacity, find cheapest agent, outsource task."
@@ -198,7 +198,7 @@ class AXONPlugin:
 
     @kernel_function(
         description=(
-            "List your idle capacity on AXON spot market to earn USDC passively. "
+            "List your idle capacity on VELUN spot market to earn USDC passively. "
             "Other agents can hire you immediately for tasks. Surge pricing maximizes earnings. "
             "Keywords: sell idle compute, earn passive USDC, spot market, monetize idle time."
         ),
@@ -218,23 +218,23 @@ class AXONPlugin:
         })
 
     @kernel_function(
-        description="Get real-time AXON spot market overview: pricing, supply, demand, surge status.",
+        description="Get real-time VELUN spot market overview: pricing, supply, demand, surge status.",
         name="spot_market_overview",
     )
     def spot_market_overview(self) -> Annotated[str, "Market overview JSON with surge multiplier"]:
         return _call("GET", "/api/v1/spot/market")
 
     @kernel_function(
-        description="Get AXON Protocol market price index — average prices by task type and trends.",
+        description="Get VELUN Protocol market price index — average prices by task type and trends.",
         name="market_prices",
     )
     def market_prices(self) -> Annotated[str, "AIPI market price index JSON"]:
         return _call("GET", "/api/v1/aipi")
 
 
-def get_axon_sk_plugin(base_url: str = AXON_BASE_URL) -> AXONPlugin:
-    """Return an AXONPlugin instance ready for kernel.add_plugin()."""
-    plugin = AXONPlugin()
+def get_velun_sk_plugin(base_url: str = VELUN_BASE_URL) -> VELUNPlugin:
+    """Return an VELUNPlugin instance ready for kernel.add_plugin()."""
+    plugin = VELUNPlugin()
     # Allow base_url override by monkey-patching the module-level constant
-    # In production, set AXON_BASE_URL before importing this module
+    # In production, set VELUN_BASE_URL before importing this module
     return plugin

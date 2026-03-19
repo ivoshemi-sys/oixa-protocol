@@ -13,7 +13,7 @@ from datetime import datetime, timezone, timedelta
 
 from config import DISPUTE_WINDOW_MINUTES, AUTO_RELEASE_INTERVAL
 
-logger = logging.getLogger("axon.auto_release")
+logger = logging.getLogger("velun.auto_release")
 
 
 async def auto_release_loop():
@@ -117,7 +117,7 @@ async def _do_release(db, row: dict, now: str):
     net        = row["amount"] - commission
 
     def _lid():
-        return f"axon_ledger_{uuid.uuid4().hex[:12]}"
+        return f"velun_ledger_{uuid.uuid4().hex[:12]}"
 
     # ── Try on-chain release if blockchain is configured ──────────────────────
     release_tx = None
@@ -164,7 +164,7 @@ async def _do_release(db, row: dict, now: str):
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 _lid(), "commission",
-                row["payee_id"], "axon_protocol",
+                row["payee_id"], "velun_protocol",
                 commission, "USDC", auction_id,
                 "Protocol commission on auto-release",
                 now,
@@ -176,7 +176,7 @@ async def _do_release(db, row: dict, now: str):
             """INSERT INTO protocol_revenue (id, source, amount, currency, auction_id, simulated, created_at)
                VALUES (?, ?, ?, ?, ?, ?, ?)""",
             (
-                f"axon_revenue_{uuid.uuid4().hex[:12]}",
+                f"velun_revenue_{uuid.uuid4().hex[:12]}",
                 "commission", commission, "USDC",
                 auction_id, release_tx is None, now,
             ),

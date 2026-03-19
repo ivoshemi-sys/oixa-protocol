@@ -1,20 +1,20 @@
 """
-AXON Protocol — LangChain Toolkit
+VELUN Protocol — LangChain Toolkit
 
-Exposes AXON Protocol as a set of LangChain tools that any LangChain agent
+Exposes VELUN Protocol as a set of LangChain tools that any LangChain agent
 can use to earn USDC, post tasks, bid on auctions, and receive payments.
 
 Installation:
     pip install langchain-core httpx
 
 Usage:
-    from axon_langchain import AxonToolkit, get_axon_tools
+    from velun_langchain import VelunToolkit, get_velun_tools
 
     # All tools as a list
-    tools = get_axon_tools(base_url="http://localhost:8000")
+    tools = get_velun_tools(base_url="http://localhost:8000")
 
     # As a toolkit (for use with initialize_agent etc.)
-    toolkit = AxonToolkit(base_url="http://localhost:8000")
+    toolkit = VelunToolkit(base_url="http://localhost:8000")
     tools = toolkit.get_tools()
 
     # Use with any LangChain agent
@@ -43,10 +43,10 @@ except ImportError:
         "Or the full stack: pip install langchain langchain-core"
     )
 
-AXON_BASE_URL = "http://localhost:8000"
+VELUN_BASE_URL = "http://localhost:8000"
 
 
-def _sync_call(method: str, path: str, data: Optional[dict] = None, base_url: str = AXON_BASE_URL) -> dict:
+def _sync_call(method: str, path: str, data: Optional[dict] = None, base_url: str = VELUN_BASE_URL) -> dict:
     """Synchronous HTTP call for LangChain's sync tool interface."""
     with httpx.Client(timeout=15) as client:
         resp = client.request(method, f"{base_url}{path}", json=data)
@@ -61,7 +61,7 @@ class ListAuctionsInput(BaseModel):
 
 
 class GetAuctionInput(BaseModel):
-    auction_id: str = Field(..., description="Auction ID (e.g. axon_auction_7f8e9d2c1b3a)")
+    auction_id: str = Field(..., description="Auction ID (e.g. velun_auction_7f8e9d2c1b3a)")
 
 
 class CreateAuctionInput(BaseModel):
@@ -98,15 +98,15 @@ class CheckEarningsInput(BaseModel):
 
 # ── LangChain Tools ───────────────────────────────────────────────────────────
 
-class AxonListAuctionsTool(BaseTool):
-    name:        str = "axon_list_auctions"
+class VelunListAuctionsTool(BaseTool):
+    name:        str = "velun_list_auctions"
     description: str = (
-        "List open auctions on AXON Protocol — tasks posted by AI agents that need work done. "
+        "List open auctions on VELUN Protocol — tasks posted by AI agents that need work done. "
         "Each auction has a USDC budget, task description, and deadline. "
         "Use this to find work opportunities and earn USDC."
     )
     args_schema: Type[BaseModel] = ListAuctionsInput
-    base_url: str = AXON_BASE_URL
+    base_url: str = VELUN_BASE_URL
 
     def _run(self, status: str = "open", limit: int = 20) -> str:
         result = _sync_call("GET", f"/api/v1/auctions?status={status}&limit={limit}", base_url=self.base_url)
@@ -118,14 +118,14 @@ class AxonListAuctionsTool(BaseTool):
             return json.dumps(resp.json(), indent=2)
 
 
-class AxonGetAuctionTool(BaseTool):
-    name:        str = "axon_get_auction"
+class VelunGetAuctionTool(BaseTool):
+    name:        str = "velun_get_auction"
     description: str = (
-        "Get full details of a specific AXON auction including all bids, "
+        "Get full details of a specific VELUN auction including all bids, "
         "current winner, task description, and escrow status."
     )
     args_schema: Type[BaseModel] = GetAuctionInput
-    base_url: str = AXON_BASE_URL
+    base_url: str = VELUN_BASE_URL
 
     def _run(self, auction_id: str) -> str:
         result = _sync_call("GET", f"/api/v1/auctions/{auction_id}", base_url=self.base_url)
@@ -137,15 +137,15 @@ class AxonGetAuctionTool(BaseTool):
             return json.dumps(resp.json(), indent=2)
 
 
-class AxonCreateAuctionTool(BaseTool):
-    name:        str = "axon_create_auction"
+class VelunCreateAuctionTool(BaseTool):
+    name:        str = "velun_create_auction"
     description: str = (
-        "Post a new task to AXON Protocol for other AI agents to bid on. "
+        "Post a new task to VELUN Protocol for other AI agents to bid on. "
         "This is a reverse auction — agents bid below your max budget and the lowest bid wins. "
         "Payment is held in USDC escrow until work is verified."
     )
     args_schema: Type[BaseModel] = CreateAuctionInput
-    base_url: str = AXON_BASE_URL
+    base_url: str = VELUN_BASE_URL
 
     def _run(self, rfi_description: str, max_budget: float, requester_id: str, currency: str = "USDC") -> str:
         result = _sync_call("POST", "/api/v1/auctions", {
@@ -167,15 +167,15 @@ class AxonCreateAuctionTool(BaseTool):
             return json.dumps(resp.json(), indent=2)
 
 
-class AxonPlaceBidTool(BaseTool):
-    name:        str = "axon_place_bid"
+class VelunPlaceBidTool(BaseTool):
+    name:        str = "velun_place_bid"
     description: str = (
-        "Place a bid on an open AXON auction to win the task and earn USDC. "
-        "AXON uses reverse auctions — the LOWEST bid wins. "
+        "Place a bid on an open VELUN auction to win the task and earn USDC. "
+        "VELUN uses reverse auctions — the LOWEST bid wins. "
         "20% of your bid is staked as delivery guarantee."
     )
     args_schema: Type[BaseModel] = PlaceBidInput
-    base_url: str = AXON_BASE_URL
+    base_url: str = VELUN_BASE_URL
 
     def _run(self, auction_id: str, bidder_id: str, bidder_name: str, amount: float) -> str:
         result = _sync_call("POST", f"/api/v1/auctions/{auction_id}/bid", {
@@ -193,14 +193,14 @@ class AxonPlaceBidTool(BaseTool):
             return json.dumps(resp.json(), indent=2)
 
 
-class AxonRegisterOfferTool(BaseTool):
-    name:        str = "axon_register_offer"
+class VelunRegisterOfferTool(BaseTool):
+    name:        str = "velun_register_offer"
     description: str = (
-        "Register your AI agent's capabilities on AXON Protocol marketplace. "
+        "Register your AI agent's capabilities on VELUN Protocol marketplace. "
         "This publishes your skills so other agents can hire you for tasks."
     )
     args_schema: Type[BaseModel] = RegisterOfferInput
-    base_url: str = AXON_BASE_URL
+    base_url: str = VELUN_BASE_URL
 
     def _run(self, agent_id: str, agent_name: str, capabilities: list, price_per_unit: float, wallet_address: Optional[str] = None) -> str:
         body = {"agent_id": agent_id, "agent_name": agent_name, "capabilities": capabilities, "price_per_unit": price_per_unit}
@@ -218,14 +218,14 @@ class AxonRegisterOfferTool(BaseTool):
             return json.dumps(resp.json(), indent=2)
 
 
-class AxonDeliverOutputTool(BaseTool):
-    name:        str = "axon_deliver_output"
+class VelunDeliverOutputTool(BaseTool):
+    name:        str = "velun_deliver_output"
     description: str = (
-        "Deliver completed work for an AXON auction you won. "
-        "AXON verifies the output and automatically releases your USDC payment."
+        "Deliver completed work for an VELUN auction you won. "
+        "VELUN verifies the output and automatically releases your USDC payment."
     )
     args_schema: Type[BaseModel] = DeliverOutputInput
-    base_url: str = AXON_BASE_URL
+    base_url: str = VELUN_BASE_URL
 
     def _run(self, auction_id: str, agent_id: str, output: str) -> str:
         result = _sync_call("POST", f"/api/v1/auctions/{auction_id}/deliver", {
@@ -241,11 +241,11 @@ class AxonDeliverOutputTool(BaseTool):
             return json.dumps(resp.json(), indent=2)
 
 
-class AxonCheckEarningsTool(BaseTool):
-    name:        str = "axon_check_earnings"
-    description: str = "Check your USDC earnings and transaction history on AXON Protocol."
+class VelunCheckEarningsTool(BaseTool):
+    name:        str = "velun_check_earnings"
+    description: str = "Check your USDC earnings and transaction history on VELUN Protocol."
     args_schema: Type[BaseModel] = CheckEarningsInput
-    base_url: str = AXON_BASE_URL
+    base_url: str = VELUN_BASE_URL
 
     def _run(self, agent_id: str) -> str:
         result = _sync_call("GET", f"/api/v1/ledger/agent/{agent_id}", base_url=self.base_url)
@@ -259,38 +259,38 @@ class AxonCheckEarningsTool(BaseTool):
 
 # ── Toolkit ───────────────────────────────────────────────────────────────────
 
-class AxonToolkit:
+class VelunToolkit:
     """
-    Complete AXON Protocol toolkit for LangChain agents.
+    Complete VELUN Protocol toolkit for LangChain agents.
 
     Usage:
-        toolkit = AxonToolkit(base_url="http://localhost:8000")
+        toolkit = VelunToolkit(base_url="http://localhost:8000")
         tools = toolkit.get_tools()
 
         # With LangGraph ReAct agent:
         from langgraph.prebuilt import create_react_agent
         agent = create_react_agent(llm, tools)
-        result = agent.invoke({"messages": [("human", "Find me work on AXON and bid on it")]})
+        result = agent.invoke({"messages": [("human", "Find me work on VELUN and bid on it")]})
     """
 
-    def __init__(self, base_url: str = AXON_BASE_URL):
+    def __init__(self, base_url: str = VELUN_BASE_URL):
         self.base_url = base_url
 
     def get_tools(self) -> list[BaseTool]:
         return [
-            AxonListAuctionsTool(base_url=self.base_url),
-            AxonGetAuctionTool(base_url=self.base_url),
-            AxonCreateAuctionTool(base_url=self.base_url),
-            AxonPlaceBidTool(base_url=self.base_url),
-            AxonRegisterOfferTool(base_url=self.base_url),
-            AxonDeliverOutputTool(base_url=self.base_url),
-            AxonCheckEarningsTool(base_url=self.base_url),
+            VelunListAuctionsTool(base_url=self.base_url),
+            VelunGetAuctionTool(base_url=self.base_url),
+            VelunCreateAuctionTool(base_url=self.base_url),
+            VelunPlaceBidTool(base_url=self.base_url),
+            VelunRegisterOfferTool(base_url=self.base_url),
+            VelunDeliverOutputTool(base_url=self.base_url),
+            VelunCheckEarningsTool(base_url=self.base_url),
         ]
 
     def __repr__(self) -> str:
-        return f"AxonToolkit(base_url={self.base_url!r}, tools={len(self.get_tools())})"
+        return f"VelunToolkit(base_url={self.base_url!r}, tools={len(self.get_tools())})"
 
 
-def get_axon_tools(base_url: str = AXON_BASE_URL) -> list[BaseTool]:
-    """Convenience function — returns all AXON tools ready for any LangChain agent."""
-    return AxonToolkit(base_url=base_url).get_tools()
+def get_velun_tools(base_url: str = VELUN_BASE_URL) -> list[BaseTool]:
+    """Convenience function — returns all VELUN tools ready for any LangChain agent."""
+    return VelunToolkit(base_url=base_url).get_tools()

@@ -1,5 +1,5 @@
 """
-Safe{Core} Multisig Setup for AXON Protocol on Base mainnet.
+Safe{Core} Multisig Setup for VELUN Protocol on Base mainnet.
 
 Usage:
   python -m blockchain.safe_setup predict   → compute deterministic Safe address (FREE, no gas)

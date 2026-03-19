@@ -1,5 +1,5 @@
 """
-AXON Protocol — Surge Pricing Engine
+VELUN Protocol — Surge Pricing Engine
 
 Dynamic pricing for spot compute capacity based on:
 - Time-of-day demand patterns (peak/off-peak)

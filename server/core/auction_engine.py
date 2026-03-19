@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from database import get_db
 from config import STAKE_PERCENTAGE
 
-logger = logging.getLogger("axon.auction")
+logger = logging.getLogger("velun.auction")
 
 
 def calculate_auction_duration(max_budget: float) -> int:
@@ -46,7 +46,7 @@ async def process_bid(auction_id: str, bidder_id: str, bidder_name: str, amount:
         return {"accepted": False, "reason": f"Bid {amount} must be lower than current best {auction['winning_bid']} (inverse auction)"}
 
     stake_amount = amount * STAKE_PERCENTAGE
-    bid_id = f"axon_bid_{uuid.uuid4().hex[:12]}"
+    bid_id = f"velun_bid_{uuid.uuid4().hex[:12]}"
 
     await db.execute(
         """INSERT INTO bids (id, auction_id, bidder_id, bidder_name, amount, stake_amount, status, created_at)
@@ -101,7 +101,7 @@ async def close_auction(auction_id: str) -> dict:
         )
 
         commission = calculate_commission(winning_bid)
-        escrow_id  = f"axon_escrow_{uuid.uuid4().hex[:12]}"
+        escrow_id  = f"velun_escrow_{uuid.uuid4().hex[:12]}"
 
         # ── Daily spending limit check ────────────────────────────────────────
         from core.daily_limit import check_limit, record_spending
@@ -129,13 +129,13 @@ async def close_auction(auction_id: str) -> dict:
         )
 
         # Stake ledger entry
-        ledger_id = f"axon_ledger_{uuid.uuid4().hex[:12]}"
+        ledger_id = f"velun_ledger_{uuid.uuid4().hex[:12]}"
         await db.execute(
             """INSERT INTO ledger
                (id, transaction_type, from_agent, to_agent, amount, currency, auction_id, description, created_at)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
-                ledger_id, "stake", winner_id, "axon_protocol",
+                ledger_id, "stake", winner_id, "velun_protocol",
                 winning_bid * STAKE_PERCENTAGE, "USDC",
                 auction_id, f"Stake held for auction {auction_id}", now,
             ),

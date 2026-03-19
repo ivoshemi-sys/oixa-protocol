@@ -1,5 +1,5 @@
 ╔══════════════════════════════════════════════════════════════════════╗
-║           AXON PROTOCOL — WALLET BACKUP INSTRUCTIONS                ║
+║           VELUN PROTOCOL — WALLET BACKUP INSTRUCTIONS                ║
 ╚══════════════════════════════════════════════════════════════════════╝
 
 PROTOCOL WALLET (BASE MAINNET)
@@ -10,7 +10,7 @@ Role:           Protocol wallet — receives commissions, controls escrow
 
 WHERE IS THE PRIVATE KEY?
 ━━━━━━━━━━━━━━━━━━━━━━━━━
-The private key is stored in: axon-protocol/.env
+The private key is stored in: velun-protocol/.env
 Variable name:  PROTOCOL_PRIVATE_KEY
 This file is gitignored and NEVER committed to GitHub.
 
@@ -28,7 +28,7 @@ SECURE BACKUP CHECKLIST (do this NOW)
 
 WHAT THIS WALLET CONTROLS
 ━━━━━━━━━━━━━━━━━━━━━━━━━
-- AXONEscrow contract: only this wallet can release/refund escrows
+- VELUNEscrow contract: only this wallet can release/refund escrows
 - Protocol commissions: all revenue flows here
 - Emergency pause: only this wallet can pause the contract
 - Safe multisig: this is the primary signer
@@ -42,7 +42,7 @@ FUND THIS WALLET
 SAFE MULTISIG SETUP
 ━━━━━━━━━━━━━━━━━━━
 Once funded, deploy a Safe:
-  cd axon-protocol/server
+  cd velun-protocol/server
   python -m blockchain.safe_setup deploy
 
 Or via the API (once server is running):
@@ -57,5 +57,5 @@ If this Mac is lost:
 4. The contract address (ESCROW_CONTRACT_ADDRESS) is unchanged
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Generated: 2026-03-18 | AXON Protocol v0.1.0 | Ivan Shemi
+Generated: 2026-03-18 | VELUN Protocol v0.1.0 | Ivan Shemi
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

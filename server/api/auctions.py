@@ -41,7 +41,7 @@ async def _row_to_auction(row, db) -> dict:
 @router.post("/auctions")
 async def create_auction(rfi: RFI):
     db = await get_db()
-    auction_id = f"axon_auction_{uuid.uuid4().hex[:12]}"
+    auction_id = f"velun_auction_{uuid.uuid4().hex[:12]}"
     now = _now()
     duration = calculate_auction_duration(rfi.max_budget)
 

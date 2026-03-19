@@ -34,7 +34,7 @@ async def get_aipi():
 
     return _response(
         {
-            "index_name": "AXON Intelligence Price Index",
+            "index_name": "VELUN Intelligence Price Index",
             "version": "0.1.0",
             "total_transactions": total_tx,
             "completed_auctions": completed_auctions,

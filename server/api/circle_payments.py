@@ -1,5 +1,5 @@
 """
-Circle Payments Network endpoints for AXON Protocol.
+Circle Payments Network endpoints for VELUN Protocol.
 
 Institutional USDC payments via Circle's API:
   - Payment intents (request USDC via blockchain or wire)
@@ -51,7 +51,7 @@ def _ok(data):
 
 class CreateIntentRequest(BaseModel):
     amount_usdc:          float
-    description:          str = "AXON Protocol payment"
+    description:          str = "VELUN Protocol payment"
     auction_id:           Optional[str] = None
     agent_id:             Optional[str] = None
     settlement_currency:  str = "USD"
@@ -108,7 +108,7 @@ async def create_circle_intent(req: CreateIntentRequest):
             "docs":   "https://developers.circle.com/circle-mint/docs",
         })
 
-    idempotency_key = f"axon-{uuid.uuid4()}"
+    idempotency_key = f"velun-{uuid.uuid4()}"
 
     try:
         intent = await create_payment_intent(
@@ -124,7 +124,7 @@ async def create_circle_intent(req: CreateIntentRequest):
     from database import get_db
 
     db  = await get_db()
-    lid = f"axon_circle_{uuid.uuid4().hex[:12]}"
+    lid = f"velun_circle_{uuid.uuid4().hex[:12]}"
     now = _TS()
 
     await db.execute(
@@ -146,7 +146,7 @@ async def create_circle_intent(req: CreateIntentRequest):
     await db.commit()
 
     return _ok({
-        "axon_payment_id":  lid,
+        "velun_payment_id":  lid,
         "circle_intent_id": intent.get("id"),
         "amount_usdc":      req.amount_usdc,
         "status":           intent.get("status", "pending"),
@@ -228,7 +228,7 @@ async def outbound_transfer(req: CreateTransferRequest):
     if chain not in valid_chains:
         raise HTTPException(400, detail=f"Invalid chain. Valid: {sorted(valid_chains)}")
 
-    idem_key = f"axon-transfer-{uuid.uuid4()}"
+    idem_key = f"velun-transfer-{uuid.uuid4()}"
     try:
         transfer = await create_transfer(
             destination_address=req.destination_address,

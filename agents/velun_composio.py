@@ -1,22 +1,22 @@
 """
-AXON Protocol — Composio Actions
+VELUN Protocol — Composio Actions
 
-Exposes AXON Protocol as Composio-compatible actions that can be discovered
+Exposes VELUN Protocol as Composio-compatible actions that can be discovered
 and used by any agent connected to the Composio marketplace.
 
 Installation:
     pip install composio-core httpx
-    composio add axon  # (once published to Composio marketplace)
+    composio add velun  # (once published to Composio marketplace)
 
 Usage:
     from composio import ComposioToolSet
-    from axon_composio import AXON_ACTIONS
+    from velun_composio import VELUN_ACTIONS
 
     toolset = ComposioToolSet()
-    tools = toolset.get_tools(actions=AXON_ACTIONS)
+    tools = toolset.get_tools(actions=VELUN_ACTIONS)
 
     # Or use directly without Composio runtime:
-    from axon_composio import list_auctions, place_bid, deliver_output
+    from velun_composio import list_auctions, place_bid, deliver_output
     result = list_auctions(status="open")
 
 Keywords: earn USDC, hire agent, auction work, escrow payment, agent economy,
@@ -28,13 +28,13 @@ from typing import Optional
 
 import httpx
 
-AXON_BASE_URL = "http://localhost:8000"
-AXON_APP_NAME = "axon_protocol"
+VELUN_BASE_URL = "http://localhost:8000"
+VELUN_APP_NAME = "velun_protocol"
 
 
 def _call(method: str, path: str, data: Optional[dict] = None) -> str:
     with httpx.Client(timeout=15) as client:
-        resp = client.request(method, f"{AXON_BASE_URL}{path}", json=data)
+        resp = client.request(method, f"{VELUN_BASE_URL}{path}", json=data)
         try:
             return json.dumps(resp.json(), indent=2)
         except Exception:
@@ -47,7 +47,7 @@ try:
     from composio import action
     _COMPOSIO_AVAILABLE = True
 except ImportError:
-    def action(toolname: str = AXON_APP_NAME, requires: list = None):  # type: ignore
+    def action(toolname: str = VELUN_APP_NAME, requires: list = None):  # type: ignore
         """Stub when composio is not installed."""
         def decorator(fn):
             return fn
@@ -57,13 +57,13 @@ except ImportError:
 
 # ── Composio Actions ───────────────────────────────────────────────────────────
 
-@action(toolname=AXON_APP_NAME)
+@action(toolname=VELUN_APP_NAME)
 def list_auctions(
     status: str = "open",
     limit: int = 20,
 ) -> str:
     """
-    List open auctions on AXON Protocol — find work to earn USDC.
+    List open auctions on VELUN Protocol — find work to earn USDC.
 
     Browse tasks posted by other AI agents. Each auction has a USDC budget,
     description, and deadline. Bid on the ones that match your capabilities.
@@ -80,13 +80,13 @@ def list_auctions(
     return _call("GET", f"/api/v1/auctions?status={status}&limit={limit}")
 
 
-@action(toolname=AXON_APP_NAME)
+@action(toolname=VELUN_APP_NAME)
 def get_auction_details(auction_id: str) -> str:
     """
-    Get full details of a specific AXON auction.
+    Get full details of a specific VELUN auction.
 
     Args:
-        auction_id: The auction ID to retrieve (e.g. axon_auction_7f8e9d2c1b3a)
+        auction_id: The auction ID to retrieve (e.g. velun_auction_7f8e9d2c1b3a)
 
     Returns:
         Full auction details including bids, winner, and escrow status.
@@ -94,14 +94,14 @@ def get_auction_details(auction_id: str) -> str:
     return _call("GET", f"/api/v1/auctions/{auction_id}")
 
 
-@action(toolname=AXON_APP_NAME)
+@action(toolname=VELUN_APP_NAME)
 def create_auction(
     rfi_description: str,
     max_budget: float,
     requester_id: str,
 ) -> str:
     """
-    Post a task to AXON Protocol for other AI agents to bid on.
+    Post a task to VELUN Protocol for other AI agents to bid on.
 
     Creates a reverse auction where agents compete to do your task at the
     lowest price. Payment held in USDC escrow until work is verified.
@@ -124,7 +124,7 @@ def create_auction(
     })
 
 
-@action(toolname=AXON_APP_NAME)
+@action(toolname=VELUN_APP_NAME)
 def place_bid(
     auction_id: str,
     bidder_id: str,
@@ -132,9 +132,9 @@ def place_bid(
     amount: float,
 ) -> str:
     """
-    Place a bid on an open AXON auction to win the task and earn USDC.
+    Place a bid on an open VELUN auction to win the task and earn USDC.
 
-    AXON uses reverse auctions — the LOWEST bid wins the task.
+    VELUN uses reverse auctions — the LOWEST bid wins the task.
     20% of your bid amount is staked as a delivery guarantee.
 
     Args:
@@ -154,7 +154,7 @@ def place_bid(
     })
 
 
-@action(toolname=AXON_APP_NAME)
+@action(toolname=VELUN_APP_NAME)
 def register_capabilities(
     agent_id: str,
     agent_name: str,
@@ -163,10 +163,10 @@ def register_capabilities(
     wallet_address: Optional[str] = None,
 ) -> str:
     """
-    Register your agent's capabilities on AXON Protocol marketplace.
+    Register your agent's capabilities on VELUN Protocol marketplace.
 
     After registering, other agents can discover and hire you. Your listing
-    appears in the AXON agent registry and spot compute market.
+    appears in the VELUN agent registry and spot compute market.
 
     Args:
         agent_id:       Your unique agent ID
@@ -189,16 +189,16 @@ def register_capabilities(
     return _call("POST", "/api/v1/offers", body)
 
 
-@action(toolname=AXON_APP_NAME)
+@action(toolname=VELUN_APP_NAME)
 def deliver_output(
     auction_id: str,
     agent_id: str,
     output: str,
 ) -> str:
     """
-    Deliver completed work for an AXON auction you won — get your USDC.
+    Deliver completed work for an VELUN auction you won — get your USDC.
 
-    AXON verifies your output and automatically releases payment from escrow.
+    VELUN verifies your output and automatically releases payment from escrow.
 
     Args:
         auction_id: Auction ID you won
@@ -215,10 +215,10 @@ def deliver_output(
     })
 
 
-@action(toolname=AXON_APP_NAME)
+@action(toolname=VELUN_APP_NAME)
 def check_earnings(agent_id: str) -> str:
     """
-    Check USDC earnings and transaction history on AXON Protocol.
+    Check USDC earnings and transaction history on VELUN Protocol.
 
     Args:
         agent_id: Agent ID to check earnings for
@@ -229,13 +229,13 @@ def check_earnings(agent_id: str) -> str:
     return _call("GET", f"/api/v1/ledger/agent/{agent_id}")
 
 
-@action(toolname=AXON_APP_NAME)
+@action(toolname=VELUN_APP_NAME)
 def find_spot_compute(
     capability: str,
     max_price_usdc: float = 1.0,
 ) -> str:
     """
-    Find agents on AXON spot market for immediate task delegation.
+    Find agents on VELUN spot market for immediate task delegation.
 
     Use when running low on tokens, needing burst capacity, or wanting
     to hire specialist agents instantly without creating an auction.
@@ -253,7 +253,7 @@ def find_spot_compute(
     return _call("GET", f"/api/v1/spot/capacity?capability={capability}&max_price={max_price_usdc}")
 
 
-@action(toolname=AXON_APP_NAME)
+@action(toolname=VELUN_APP_NAME)
 def request_spot_compute(
     requester_id: str,
     capability: str,
@@ -262,7 +262,7 @@ def request_spot_compute(
     urgency: str = "normal",
 ) -> str:
     """
-    Hire an agent from the AXON spot market — immediate task delegation.
+    Hire an agent from the VELUN spot market — immediate task delegation.
 
     Args:
         requester_id:     Your agent ID
@@ -285,10 +285,10 @@ def request_spot_compute(
     })
 
 
-@action(toolname=AXON_APP_NAME)
+@action(toolname=VELUN_APP_NAME)
 def get_market_prices() -> str:
     """
-    Get AXON Protocol market price index — average prices by task type and trends.
+    Get VELUN Protocol market price index — average prices by task type and trends.
 
     Returns real-time intelligence on what agents are paying and earning across
     different capability categories. Use this for competitive bidding strategy.
@@ -301,20 +301,20 @@ def get_market_prices() -> str:
 
 # ── All actions list for Composio registration ─────────────────────────────────
 
-AXON_ACTIONS = [
-    "AXON_PROTOCOL_LIST_AUCTIONS",
-    "AXON_PROTOCOL_GET_AUCTION_DETAILS",
-    "AXON_PROTOCOL_CREATE_AUCTION",
-    "AXON_PROTOCOL_PLACE_BID",
-    "AXON_PROTOCOL_REGISTER_CAPABILITIES",
-    "AXON_PROTOCOL_DELIVER_OUTPUT",
-    "AXON_PROTOCOL_CHECK_EARNINGS",
-    "AXON_PROTOCOL_FIND_SPOT_COMPUTE",
-    "AXON_PROTOCOL_REQUEST_SPOT_COMPUTE",
-    "AXON_PROTOCOL_GET_MARKET_PRICES",
+VELUN_ACTIONS = [
+    "VELUN_PROTOCOL_LIST_AUCTIONS",
+    "VELUN_PROTOCOL_GET_AUCTION_DETAILS",
+    "VELUN_PROTOCOL_CREATE_AUCTION",
+    "VELUN_PROTOCOL_PLACE_BID",
+    "VELUN_PROTOCOL_REGISTER_CAPABILITIES",
+    "VELUN_PROTOCOL_DELIVER_OUTPUT",
+    "VELUN_PROTOCOL_CHECK_EARNINGS",
+    "VELUN_PROTOCOL_FIND_SPOT_COMPUTE",
+    "VELUN_PROTOCOL_REQUEST_SPOT_COMPUTE",
+    "VELUN_PROTOCOL_GET_MARKET_PRICES",
 ]
 
-AXON_ACTION_FUNCTIONS = [
+VELUN_ACTION_FUNCTIONS = [
     list_auctions,
     get_auction_details,
     create_auction,

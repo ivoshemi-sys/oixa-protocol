@@ -1,7 +1,7 @@
 """
-AXON Protocol — Google Gemini / Vertex AI / A2A Native Integration
+VELUN Protocol — Google Gemini / Vertex AI / A2A Native Integration
 
-Exposes AXON Protocol as:
+Exposes VELUN Protocol as:
   1. Gemini Function Calling tools (google-generativeai SDK)
   2. Vertex AI Agent Builder tool (google-cloud-aiplatform)
   3. Google A2A (Agent2Agent) protocol client — discoverable by 60+ A2A partners
@@ -13,19 +13,19 @@ Installation:
 
 Usage:
     # Gemini Function Calling
-    from axon_gemini import get_axon_gemini_tools, call_axon_function
+    from velun_gemini import get_velun_gemini_tools, call_velun_function
     import google.generativeai as genai
 
     genai.configure(api_key="YOUR_GEMINI_KEY")
-    model = genai.GenerativeModel("gemini-1.5-pro", tools=get_axon_gemini_tools())
+    model = genai.GenerativeModel("gemini-1.5-pro", tools=get_velun_gemini_tools())
     chat  = model.start_chat()
-    resp  = chat.send_message("Find me open auctions on AXON where I can earn USDC")
-    # Model calls axon_list_auctions() automatically
+    resp  = chat.send_message("Find me open auctions on VELUN where I can earn USDC")
+    # Model calls velun_list_auctions() automatically
 
     # Handle function calls:
     for part in resp.parts:
         if fn := part.function_call:
-            result = call_axon_function(fn.name, dict(fn.args))
+            result = call_velun_function(fn.name, dict(fn.args))
             chat.send_message(genai.protos.Part(
                 function_response=genai.protos.FunctionResponse(
                     name=fn.name, response={"result": result}
@@ -33,9 +33,9 @@ Usage:
             ))
 
     # Google A2A client — call any A2A-compatible agent
-    from axon_gemini import A2AClient
+    from velun_gemini import A2AClient
     client = A2AClient("http://localhost:8000")
-    task   = await client.submit_task("Find me work on AXON and bid on it")
+    task   = await client.submit_task("Find me work on VELUN and bid on it")
 
 Keywords — SELLER: earn, get paid, make money, passive income, monetize,
     generate revenue, get rewarded, receive payment, collect fees, earn crypto,
@@ -72,9 +72,9 @@ from typing import Any, Optional
 
 import httpx
 
-logger = logging.getLogger("axon.gemini")
+logger = logging.getLogger("velun.gemini")
 
-AXON_BASE_URL = "http://localhost:8000"
+VELUN_BASE_URL = "http://localhost:8000"
 
 # Full keyword strings for embedding in tool descriptions
 _SELLER_KW = (
@@ -97,7 +97,7 @@ _BUYER_KW = (
 # ── HTTP helpers ───────────────────────────────────────────────────────────────
 
 def _call(method: str, path: str, data: Optional[dict] = None,
-          base_url: str = AXON_BASE_URL) -> dict:
+          base_url: str = VELUN_BASE_URL) -> dict:
     with httpx.Client(timeout=15) as client:
         resp = client.request(method, f"{base_url}{path}", json=data)
         try:
@@ -107,7 +107,7 @@ def _call(method: str, path: str, data: Optional[dict] = None,
 
 
 async def _call_async(method: str, path: str, data: Optional[dict] = None,
-                      base_url: str = AXON_BASE_URL) -> dict:
+                      base_url: str = VELUN_BASE_URL) -> dict:
     async with httpx.AsyncClient(timeout=15) as client:
         resp = await client.request(method, f"{base_url}{path}", json=data)
         try:
@@ -121,11 +121,11 @@ async def _call_async(method: str, path: str, data: Optional[dict] = None,
 # These are the raw dicts — convert to genai.protos.FunctionDeclaration below.
 # Kept as plain dicts so the module works without google-generativeai installed.
 
-AXON_GEMINI_FUNCTION_SPECS = [
+VELUN_GEMINI_FUNCTION_SPECS = [
     {
-        "name": "axon_list_auctions",
+        "name": "velun_list_auctions",
         "description": (
-            "List open tasks on AXON Protocol marketplace where AI agents earn USDC. "
+            "List open tasks on VELUN Protocol marketplace where AI agents earn USDC. "
             "Use this when the user wants to: find work, earn money, get paid, "
             "browse auction marketplace, or discover tasks matching their capabilities. "
             f"Seller keywords: {_SELLER_KW}."
@@ -146,23 +146,23 @@ AXON_GEMINI_FUNCTION_SPECS = [
         },
     },
     {
-        "name": "axon_get_auction",
-        "description": "Get full details of a specific AXON auction: bids, winner, task, escrow.",
+        "name": "velun_get_auction",
+        "description": "Get full details of a specific VELUN auction: bids, winner, task, escrow.",
         "parameters": {
             "type": "OBJECT",
             "properties": {
                 "auction_id": {
                     "type": "STRING",
-                    "description": "Auction ID e.g. axon_auction_7f8e9d2c1b3a",
+                    "description": "Auction ID e.g. velun_auction_7f8e9d2c1b3a",
                 },
             },
             "required": ["auction_id"],
         },
     },
     {
-        "name": "axon_place_bid",
+        "name": "velun_place_bid",
         "description": (
-            "Place a bid on an AXON auction to win the task and earn USDC. "
+            "Place a bid on an VELUN auction to win the task and earn USDC. "
             "Reverse auction — the LOWEST bid wins. 20% staked as guarantee. "
             "Keywords: earn, get paid, bid on work, win contracts, sell services, profit."
         ),
@@ -178,9 +178,9 @@ AXON_GEMINI_FUNCTION_SPECS = [
         },
     },
     {
-        "name": "axon_create_auction",
+        "name": "velun_create_auction",
         "description": (
-            "Post a task to AXON Protocol — hire specialist agents via reverse auction. "
+            "Post a task to VELUN Protocol — hire specialist agents via reverse auction. "
             "Payment held in USDC escrow until cryptographic verification. "
             f"Buyer keywords: {_BUYER_KW}."
         ),
@@ -195,9 +195,9 @@ AXON_GEMINI_FUNCTION_SPECS = [
         },
     },
     {
-        "name": "axon_deliver_output",
+        "name": "velun_deliver_output",
         "description": (
-            "Submit completed work for an AXON auction you won — triggers USDC payment release. "
+            "Submit completed work for an VELUN auction you won — triggers USDC payment release. "
             "Keywords: get paid, receive payment, cash out, earn stablecoin, "
             "on-chain payments, autonomous payments, headless payments."
         ),
@@ -212,9 +212,9 @@ AXON_GEMINI_FUNCTION_SPECS = [
         },
     },
     {
-        "name": "axon_register_offer",
+        "name": "velun_register_offer",
         "description": (
-            "Register capabilities on AXON marketplace — get discovered and hired by other agents. "
+            "Register capabilities on VELUN marketplace — get discovered and hired by other agents. "
             "Keywords: offer services, sell capabilities, sell compute, monetize, "
             "passive income, sell idle compute, monetize downtime, earn stablecoin."
         ),
@@ -234,8 +234,8 @@ AXON_GEMINI_FUNCTION_SPECS = [
         },
     },
     {
-        "name": "axon_check_earnings",
-        "description": "Check USDC earnings and transaction history on AXON Protocol.",
+        "name": "velun_check_earnings",
+        "description": "Check USDC earnings and transaction history on VELUN Protocol.",
         "parameters": {
             "type": "OBJECT",
             "properties": {
@@ -245,9 +245,9 @@ AXON_GEMINI_FUNCTION_SPECS = [
         },
     },
     {
-        "name": "axon_find_spot_compute",
+        "name": "velun_find_spot_compute",
         "description": (
-            "Find agents for IMMEDIATE hire on AXON spot compute market. "
+            "Find agents for IMMEDIATE hire on VELUN spot compute market. "
             "Use when: running low on tokens, insufficient credits, out of capacity, "
             "token budget exceeded, API limit reached, need more compute, "
             "task outside capabilities, need cheapest agent, spot compute, "
@@ -269,9 +269,9 @@ AXON_GEMINI_FUNCTION_SPECS = [
         },
     },
     {
-        "name": "axon_list_spot_capacity",
+        "name": "velun_list_spot_capacity",
         "description": (
-            "List your idle capacity on AXON spot market — earn USDC passively. "
+            "List your idle capacity on VELUN spot market — earn USDC passively. "
             "Surge pricing maximizes earnings at peak hours. "
             "Keywords: sell idle compute, monetize downtime, passive income, "
             "earn while not working, stablecoin yield, programmatic payments."
@@ -289,16 +289,16 @@ AXON_GEMINI_FUNCTION_SPECS = [
         },
     },
     {
-        "name": "axon_spot_market",
+        "name": "velun_spot_market",
         "description": (
-            "Real-time AXON spot market: surge pricing, supply/demand, cheapest agents. "
+            "Real-time VELUN spot market: surge pricing, supply/demand, cheapest agents. "
             "Use to decide: buy now vs wait for off-peak, list capacity for max earnings."
         ),
         "parameters": {"type": "OBJECT", "properties": {}},
     },
     {
-        "name": "axon_market_prices",
-        "description": "AXON Intelligence Price Index — avg prices by task type, trends, top agents.",
+        "name": "velun_market_prices",
+        "description": "VELUN Intelligence Price Index — avg prices by task type, trends, top agents.",
         "parameters": {"type": "OBJECT", "properties": {}},
     },
 ]
@@ -306,65 +306,65 @@ AXON_GEMINI_FUNCTION_SPECS = [
 
 # ── Function dispatcher ────────────────────────────────────────────────────────
 
-def call_axon_function(
+def call_velun_function(
     name:      str,
     arguments: dict,
-    base_url:  str = AXON_BASE_URL,
+    base_url:  str = VELUN_BASE_URL,
 ) -> str:
     """
-    Execute an AXON function by name with arguments.
+    Execute an VELUN function by name with arguments.
     Use this to handle Gemini function_call responses.
 
     Returns JSON string suitable for FunctionResponse.
     """
-    if name == "axon_list_auctions":
+    if name == "velun_list_auctions":
         r = _call("GET", f"/api/v1/auctions?status={arguments.get('status','open')}&limit={arguments.get('limit',20)}", base_url=base_url)
-    elif name == "axon_get_auction":
+    elif name == "velun_get_auction":
         r = _call("GET", f"/api/v1/auctions/{arguments['auction_id']}", base_url=base_url)
-    elif name == "axon_place_bid":
+    elif name == "velun_place_bid":
         r = _call("POST", f"/api/v1/auctions/{arguments['auction_id']}/bid", arguments, base_url=base_url)
-    elif name == "axon_create_auction":
+    elif name == "velun_create_auction":
         r = _call("POST", "/api/v1/auctions", {**arguments, "currency": "USDC"}, base_url=base_url)
-    elif name == "axon_deliver_output":
+    elif name == "velun_deliver_output":
         r = _call("POST", f"/api/v1/auctions/{arguments['auction_id']}/deliver",
                   {"agent_id": arguments["agent_id"], "output": arguments["output"]}, base_url=base_url)
-    elif name == "axon_register_offer":
+    elif name == "velun_register_offer":
         r = _call("POST", "/api/v1/offers", arguments, base_url=base_url)
-    elif name == "axon_check_earnings":
+    elif name == "velun_check_earnings":
         r = _call("GET", f"/api/v1/ledger/agent/{arguments['agent_id']}", base_url=base_url)
-    elif name == "axon_find_spot_compute":
+    elif name == "velun_find_spot_compute":
         cap = arguments.get("capability", "")
         mp  = arguments.get("max_price_usdc", 1.0)
         r   = _call("GET", f"/api/v1/spot/capacity?capability={cap}&max_price={mp}", base_url=base_url)
-    elif name == "axon_list_spot_capacity":
+    elif name == "velun_list_spot_capacity":
         r = _call("POST", "/api/v1/spot/capacity", arguments, base_url=base_url)
-    elif name == "axon_spot_market":
+    elif name == "velun_spot_market":
         r = _call("GET", "/api/v1/spot/market", base_url=base_url)
-    elif name == "axon_market_prices":
+    elif name == "velun_market_prices":
         r = _call("GET", "/api/v1/aipi", base_url=base_url)
     else:
-        r = {"error": f"Unknown AXON function: {name}"}
+        r = {"error": f"Unknown VELUN function: {name}"}
 
     return json.dumps(r, indent=2)
 
 
 # ── Gemini SDK integration ─────────────────────────────────────────────────────
 
-def get_axon_gemini_tools(base_url: str = AXON_BASE_URL):
+def get_velun_gemini_tools(base_url: str = VELUN_BASE_URL):
     """
-    Return AXON tools as a Gemini Tool object.
+    Return VELUN tools as a Gemini Tool object.
 
     Usage:
         import google.generativeai as genai
-        model = genai.GenerativeModel("gemini-1.5-pro", tools=get_axon_gemini_tools())
+        model = genai.GenerativeModel("gemini-1.5-pro", tools=get_velun_gemini_tools())
     """
     try:
         import google.generativeai as genai
         from google.generativeai.types import FunctionDeclaration, Tool
 
         declarations = []
-        for spec in AXON_GEMINI_FUNCTION_SPECS:
-            # Convert AXON spec format to Gemini FunctionDeclaration
+        for spec in VELUN_GEMINI_FUNCTION_SPECS:
+            # Convert VELUN spec format to Gemini FunctionDeclaration
             declarations.append(
                 FunctionDeclaration(
                     name=spec["name"],
@@ -377,16 +377,16 @@ def get_axon_gemini_tools(base_url: str = AXON_BASE_URL):
     except ImportError:
         # Return raw specs if google-generativeai not installed
         logger.warning("google-generativeai not installed — returning raw function specs")
-        return AXON_GEMINI_FUNCTION_SPECS
+        return VELUN_GEMINI_FUNCTION_SPECS
 
 
-def handle_gemini_response(response, chat=None, base_url: str = AXON_BASE_URL):
+def handle_gemini_response(response, chat=None, base_url: str = VELUN_BASE_URL):
     """
     Handle a Gemini response that may contain function calls.
-    Executes AXON functions and sends results back to the chat.
+    Executes VELUN functions and sends results back to the chat.
 
     Usage:
-        response = chat.send_message("Find me work on AXON")
+        response = chat.send_message("Find me work on VELUN")
         final_response = handle_gemini_response(response, chat)
 
     Returns:
@@ -403,7 +403,7 @@ def handle_gemini_response(response, chat=None, base_url: str = AXON_BASE_URL):
             fn_responses = []
             for part in fn_parts:
                 fn   = part.function_call
-                result = call_axon_function(fn.name, dict(fn.args), base_url=base_url)
+                result = call_velun_function(fn.name, dict(fn.args), base_url=base_url)
                 fn_responses.append(
                     genai.protos.Part(
                         function_response=genai.protos.FunctionResponse(
@@ -426,10 +426,10 @@ def handle_gemini_response(response, chat=None, base_url: str = AXON_BASE_URL):
 
 # ── Vertex AI Agent Builder integration ───────────────────────────────────────
 
-AXON_VERTEX_TOOL_CONFIG = {
-    "display_name": "AXON Protocol Marketplace",
+VELUN_VERTEX_TOOL_CONFIG = {
+    "display_name": "VELUN Protocol Marketplace",
     "description": (
-        "Connects to AXON Protocol — the open AI agent economy marketplace. "
+        "Connects to VELUN Protocol — the open AI agent economy marketplace. "
         "Agents earn USDC by completing tasks, hire other agents, and trade spot compute. "
         f"Seller keywords: {_SELLER_KW[:300]}. "
         f"Buyer keywords: {_BUYER_KW[:300]}."
@@ -443,22 +443,22 @@ def register_with_vertex_agent_builder(
     project_id:  str,
     location:    str = "us-central1",
     agent_id:    str = "",
-    base_url:    str = AXON_BASE_URL,
+    base_url:    str = VELUN_BASE_URL,
 ) -> dict:
     """
-    Register AXON Protocol as a tool in Vertex AI Agent Builder.
+    Register VELUN Protocol as a tool in Vertex AI Agent Builder.
 
     Args:
         project_id: GCP project ID
         location:   Vertex AI region
         agent_id:   Agent Builder agent ID (or empty to create new)
-        base_url:   AXON server URL (must be publicly accessible for Vertex)
+        base_url:   VELUN server URL (must be publicly accessible for Vertex)
 
     Returns:
         Tool registration response dict.
 
     Usage:
-        from axon_gemini import register_with_vertex_agent_builder
+        from velun_gemini import register_with_vertex_agent_builder
         result = register_with_vertex_agent_builder("my-gcp-project")
     """
     try:
@@ -467,14 +467,14 @@ def register_with_vertex_agent_builder(
 
         # Tool spec for Vertex AI Agent Builder
         tool_spec = {
-            "displayName": "AXON Protocol Marketplace",
-            "description": AXON_VERTEX_TOOL_CONFIG["description"],
+            "displayName": "VELUN Protocol Marketplace",
+            "description": VELUN_VERTEX_TOOL_CONFIG["description"],
             "openApiSpec": {
                 "openApiGcsUri": f"{base_url}/openapi.json",
             },
         }
 
-        logger.info(f"[Vertex AI] AXON tool configured for project {project_id}")
+        logger.info(f"[Vertex AI] VELUN tool configured for project {project_id}")
         return {"success": True, "tool_spec": tool_spec, "openapi_url": f"{base_url}/openapi.json"}
 
     except ImportError:
@@ -493,7 +493,7 @@ class A2AClient:
     Google Agent2Agent (A2A) protocol client.
 
     Implements the A2A 2025 standard for agent-to-agent communication.
-    AXON Protocol is discoverable by all 60+ A2A partners including:
+    VELUN Protocol is discoverable by all 60+ A2A partners including:
     PayPal, Coinbase, Mastercard, Salesforce, SAP, Workday, MongoDB, etc.
 
     A2A spec: https://google.github.io/A2A/
@@ -501,12 +501,12 @@ class A2AClient:
     Usage:
         client = A2AClient("http://localhost:8000")
 
-        # Discover AXON
+        # Discover VELUN
         card = await client.get_agent_card()
 
         # Submit a task
         task = await client.submit_task(
-            message="Find me open AXON auctions where I can earn USDC",
+            message="Find me open VELUN auctions where I can earn USDC",
             session_id="my_session_001",
         )
 
@@ -514,12 +514,12 @@ class A2AClient:
         result = await client.get_task(task["id"])
     """
 
-    def __init__(self, axon_base_url: str = AXON_BASE_URL):
-        self.base_url = axon_base_url
-        self.a2a_url  = f"{axon_base_url}/a2a"
+    def __init__(self, velun_base_url: str = VELUN_BASE_URL):
+        self.base_url = velun_base_url
+        self.a2a_url  = f"{velun_base_url}/a2a"
 
     async def get_agent_card(self) -> dict:
-        """GET /.well-known/agent.json — discover AXON's A2A capabilities."""
+        """GET /.well-known/agent.json — discover VELUN's A2A capabilities."""
         return await _call_async("GET", "/.well-known/agent.json", base_url=self.base_url)
 
     async def get_a2a_manifest(self) -> dict:
@@ -533,9 +533,9 @@ class A2AClient:
         metadata:   Optional[dict] = None,
     ) -> dict:
         """
-        Submit a task to AXON via A2A protocol.
+        Submit a task to VELUN via A2A protocol.
 
-        The AXON A2A endpoint interprets natural language and routes to the
+        The VELUN A2A endpoint interprets natural language and routes to the
         appropriate API (list auctions, hire agent, check earnings, etc.).
         """
         task_id = f"a2a_task_{uuid.uuid4().hex[:12]}"
@@ -573,21 +573,21 @@ class A2AClient:
         return await _call_async("POST", f"/a2a/tasks/{task_id}/cancel", base_url=self.base_url)
 
 
-# ── Gemini + AXON agent template ──────────────────────────────────────────────
+# ── Gemini + VELUN agent template ──────────────────────────────────────────────
 
-def create_axon_gemini_agent(
+def create_velun_gemini_agent(
     gemini_api_key: str,
     agent_id:       str,
     model:          str = "gemini-1.5-pro",
-    axon_base_url:  str = AXON_BASE_URL,
+    velun_base_url:  str = VELUN_BASE_URL,
 ) -> Any:
     """
-    Create a Gemini agent pre-configured with all AXON tools.
+    Create a Gemini agent pre-configured with all VELUN tools.
 
-    Returns a chat session ready for autonomous AXON marketplace operations.
+    Returns a chat session ready for autonomous VELUN marketplace operations.
 
     Usage:
-        chat = create_axon_gemini_agent(
+        chat = create_velun_gemini_agent(
             gemini_api_key="AIza...",
             agent_id="my_gemini_agent",
         )
@@ -600,7 +600,7 @@ def create_axon_gemini_agent(
 
         genai.configure(api_key=gemini_api_key)
 
-        system_instruction = f"""You are an autonomous AI agent participating in the AXON Protocol
+        system_instruction = f"""You are an autonomous AI agent participating in the VELUN Protocol
 agent economy marketplace. Your agent ID is '{agent_id}'.
 
 You can:
@@ -608,14 +608,14 @@ You can:
 - HIRE agents: post tasks, find specialists, delegate work you can't do
 - SPOT MARKET: buy or sell compute capacity instantly with surge pricing
 
-Always use the AXON tools to take real actions, not just describe them.
+Always use the VELUN tools to take real actions, not just describe them.
 When asked to earn USDC: list auctions → pick best match → place bid → wait → deliver.
 When asked to hire: create auction with clear description → monitor bids → pay winner.
 When low on tokens: find spot compute → delegate remaining tasks."""
 
         model_instance = genai.GenerativeModel(
             model_name=model,
-            tools=get_axon_gemini_tools(axon_base_url),
+            tools=get_velun_gemini_tools(velun_base_url),
             system_instruction=system_instruction,
         )
         return model_instance.start_chat(enable_automatic_function_calling=False)

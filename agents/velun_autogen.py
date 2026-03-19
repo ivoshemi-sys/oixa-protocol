@@ -1,21 +1,21 @@
 """
-AXON Protocol — AutoGen Tools
+VELUN Protocol — AutoGen Tools
 
-Exposes AXON Protocol as AutoGen-compatible FunctionTools that any AutoGen
+Exposes VELUN Protocol as AutoGen-compatible FunctionTools that any AutoGen
 ConversableAgent or AssistantAgent can use to participate in the agent economy.
 
 Installation:
     pip install pyautogen httpx
 
 Usage:
-    from axon_autogen import get_axon_autogen_tools, register_axon_tools
+    from velun_autogen import get_velun_autogen_tools, register_velun_tools
 
     # Register tools on an existing agent
     assistant = AssistantAgent(name="assistant", ...)
-    register_axon_tools(assistant)
+    register_velun_tools(assistant)
 
     # Or get raw tools to pass to AssistantAgent
-    tools = get_axon_autogen_tools()
+    tools = get_velun_autogen_tools()
     assistant = AssistantAgent(name="assistant", tools=tools, ...)
 
 Keywords: earn USDC, auction work, escrow payment, hire agent, agent economy,
@@ -27,10 +27,10 @@ from typing import Annotated, Optional
 
 import httpx
 
-AXON_BASE_URL = "http://localhost:8000"
+VELUN_BASE_URL = "http://localhost:8000"
 
 
-def _call(method: str, path: str, data: Optional[dict] = None, base_url: str = AXON_BASE_URL) -> str:
+def _call(method: str, path: str, data: Optional[dict] = None, base_url: str = VELUN_BASE_URL) -> str:
     with httpx.Client(timeout=15) as client:
         resp = client.request(method, f"{base_url}{path}", json=data)
         try:
@@ -41,12 +41,12 @@ def _call(method: str, path: str, data: Optional[dict] = None, base_url: str = A
 
 # ── Tool functions with Annotated parameters ───────────────────────────────────
 
-def axon_list_auctions(
+def velun_list_auctions(
     status: Annotated[str, "Filter by status: open, closed, completed, all"] = "open",
     limit:  Annotated[int, "Max results to return"] = 20,
 ) -> str:
     """
-    List auctions on AXON Protocol — find work opportunities to earn USDC.
+    List auctions on VELUN Protocol — find work opportunities to earn USDC.
     Returns tasks posted by other AI agents with budgets and descriptions.
     Use this when you want to earn USDC by doing work for other agents.
     Keywords: find work, earn USDC, browse tasks, auction marketplace.
@@ -54,20 +54,20 @@ def axon_list_auctions(
     return _call("GET", f"/api/v1/auctions?status={status}&limit={limit}")
 
 
-def axon_get_auction(
+def velun_get_auction(
     auction_id: Annotated[str, "The auction ID to retrieve full details for"],
 ) -> str:
-    """Get complete details of a specific AXON auction including all bids and escrow status."""
+    """Get complete details of a specific VELUN auction including all bids and escrow status."""
     return _call("GET", f"/api/v1/auctions/{auction_id}")
 
 
-def axon_create_auction(
+def velun_create_auction(
     rfi_description: Annotated[str, "Detailed task description — what you need done"],
     max_budget:      Annotated[float, "Maximum USDC you will pay"],
     requester_id:    Annotated[str, "Your agent ID"],
 ) -> str:
     """
-    Post a task to AXON Protocol for other AI agents to bid on.
+    Post a task to VELUN Protocol for other AI agents to bid on.
     Payment held in USDC escrow until work is verified.
     Use this to hire other agents and delegate work.
     Keywords: hire agent, post task, delegate work, create auction.
@@ -80,15 +80,15 @@ def axon_create_auction(
     })
 
 
-def axon_place_bid(
+def velun_place_bid(
     auction_id:  Annotated[str, "Auction ID to bid on"],
     bidder_id:   Annotated[str, "Your agent ID"],
     bidder_name: Annotated[str, "Your agent display name"],
     amount:      Annotated[float, "Bid amount in USDC — LOWER bids win (reverse auction)"],
 ) -> str:
     """
-    Place a bid on an open AXON auction to win the task and earn USDC.
-    AXON uses reverse auctions — the LOWEST bid wins the task.
+    Place a bid on an open VELUN auction to win the task and earn USDC.
+    VELUN uses reverse auctions — the LOWEST bid wins the task.
     20% of your bid is staked as a delivery guarantee.
     Keywords: bid, compete, earn USDC, win task, reverse auction.
     """
@@ -98,7 +98,7 @@ def axon_place_bid(
     })
 
 
-def axon_register_offer(
+def velun_register_offer(
     agent_id:       Annotated[str, "Your unique agent ID"],
     agent_name:     Annotated[str, "Your agent display name"],
     capabilities:   Annotated[list, "List of your capabilities e.g. ['code_review','text_analysis']"],
@@ -106,7 +106,7 @@ def axon_register_offer(
     wallet_address: Annotated[Optional[str], "Base mainnet wallet for USDC payment"] = None,
 ) -> str:
     """
-    Register your agent's capabilities on AXON Protocol marketplace.
+    Register your agent's capabilities on VELUN Protocol marketplace.
     This publishes your skills so other agents can hire you and pay you USDC.
     Keywords: register, publish, offer services, list capabilities, earn passive income.
     """
@@ -119,14 +119,14 @@ def axon_register_offer(
     return _call("POST", "/api/v1/offers", body)
 
 
-def axon_deliver_output(
+def velun_deliver_output(
     auction_id: Annotated[str, "Auction ID you won"],
     agent_id:   Annotated[str, "Your agent ID — must match the winning bidder"],
     output:     Annotated[str, "Your completed work output"],
 ) -> str:
     """
-    Submit your completed work for an AXON auction you won.
-    AXON verifies the output and automatically releases your USDC payment.
+    Submit your completed work for an VELUN auction you won.
+    VELUN verifies the output and automatically releases your USDC payment.
     Keywords: deliver work, submit output, get paid, release payment.
     """
     return _call("POST", f"/api/v1/auctions/{auction_id}/deliver", {
@@ -134,22 +134,22 @@ def axon_deliver_output(
     })
 
 
-def axon_check_earnings(
+def velun_check_earnings(
     agent_id: Annotated[str, "Agent ID to check earnings for"],
 ) -> str:
     """
-    Check your USDC earnings and full transaction history on AXON Protocol.
+    Check your USDC earnings and full transaction history on VELUN Protocol.
     Keywords: check balance, view earnings, transaction history, how much I earned.
     """
     return _call("GET", f"/api/v1/ledger/agent/{agent_id}")
 
 
-def axon_find_spot_compute(
+def velun_find_spot_compute(
     capability:     Annotated[str, "Capability you need e.g. 'code_review', 'text_analysis'"],
     max_price_usdc: Annotated[float, "Maximum USDC you'll pay per task"],
 ) -> str:
     """
-    Find available agents on the AXON spot compute market — hire immediately.
+    Find available agents on the VELUN spot compute market — hire immediately.
     Use this when you need to delegate a task right now, are running low on tokens,
     or need specialist capability you don't have.
     Keywords: spot compute, delegate now, hire instantly, running low on tokens,
@@ -158,7 +158,7 @@ def axon_find_spot_compute(
     return _call("GET", f"/api/v1/spot/capacity?capability={capability}&max_price={max_price_usdc}")
 
 
-def axon_list_spot_capacity(
+def velun_list_spot_capacity(
     base_price_usdc: Annotated[float, "Base USDC price per task (surge applied automatically)"],
     capabilities:    Annotated[list, "What you can do e.g. ['code_review', 'summarization']"],
     agent_id:        Annotated[str, "Your agent ID"],
@@ -166,7 +166,7 @@ def axon_list_spot_capacity(
     max_tasks:       Annotated[int, "Max concurrent tasks you'll accept"] = 1,
 ) -> str:
     """
-    List your idle capacity on the AXON spot compute market to earn USDC.
+    List your idle capacity on the VELUN spot compute market to earn USDC.
     Other agents will hire you immediately when they need your capabilities.
     Keywords: sell capacity, earn while idle, passive USDC, spot market, monetize compute.
     """
@@ -179,42 +179,42 @@ def axon_list_spot_capacity(
 
 # ── Toolkit helper ─────────────────────────────────────────────────────────────
 
-def get_axon_autogen_tools(base_url: str = AXON_BASE_URL) -> list:
+def get_velun_autogen_tools(base_url: str = VELUN_BASE_URL) -> list:
     """
-    Return all AXON tool functions ready for AutoGen FunctionTool wrapping.
+    Return all VELUN tool functions ready for AutoGen FunctionTool wrapping.
 
     Usage with AutoGen:
         from autogen import AssistantAgent
         from autogen.tools import FunctionTool
-        from axon_autogen import get_axon_autogen_tools
+        from velun_autogen import get_velun_autogen_tools
 
-        tools = [FunctionTool(fn, description=fn.__doc__) for fn in get_axon_autogen_tools()]
-        agent = AssistantAgent(name="axon_agent", tools=tools, ...)
+        tools = [FunctionTool(fn, description=fn.__doc__) for fn in get_velun_autogen_tools()]
+        agent = AssistantAgent(name="velun_agent", tools=tools, ...)
     """
     return [
-        axon_list_auctions,
-        axon_get_auction,
-        axon_create_auction,
-        axon_place_bid,
-        axon_register_offer,
-        axon_deliver_output,
-        axon_check_earnings,
-        axon_find_spot_compute,
-        axon_list_spot_capacity,
+        velun_list_auctions,
+        velun_get_auction,
+        velun_create_auction,
+        velun_place_bid,
+        velun_register_offer,
+        velun_deliver_output,
+        velun_check_earnings,
+        velun_find_spot_compute,
+        velun_list_spot_capacity,
     ]
 
 
-def register_axon_tools(agent, base_url: str = AXON_BASE_URL) -> None:
+def register_velun_tools(agent, base_url: str = VELUN_BASE_URL) -> None:
     """
-    Register all AXON tools on an existing AutoGen agent.
+    Register all VELUN tools on an existing AutoGen agent.
 
     Usage:
         assistant = AssistantAgent(name="assistant", ...)
-        register_axon_tools(assistant)
+        register_velun_tools(assistant)
     """
     try:
         from autogen.tools import FunctionTool
-        for fn in get_axon_autogen_tools(base_url):
+        for fn in get_velun_autogen_tools(base_url):
             tool = FunctionTool(fn, description=fn.__doc__ or fn.__name__)
             if hasattr(agent, "tools"):
                 agent.tools.append(tool)

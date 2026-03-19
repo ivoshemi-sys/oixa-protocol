@@ -1,5 +1,5 @@
 """
-Unified payment router for AXON Protocol.
+Unified payment router for VELUN Protocol.
 
 Auto-detects USDC source network and routes to the correct handler.
 Provides a single normalized view across CCTP, Coinbase Commerce,
@@ -16,7 +16,7 @@ Network detection priority:
 import logging
 from typing import Optional
 
-logger = logging.getLogger("axon.payment_router")
+logger = logging.getLogger("velun.payment_router")
 
 # ── Network normalization map ─────────────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 """
-AXON Protocol — Token Swap Engine (Uniswap V3 on Base)
+VELUN Protocol — Token Swap Engine (Uniswap V3 on Base)
 
 Detecta el balance completo de una wallet en Base mainnet y ejecuta swaps
 a USDC vía Uniswap V3. Toda comunicación con el usuario usa lenguaje simple:
@@ -15,7 +15,7 @@ import json
 import logging
 from typing import Optional
 
-logger = logging.getLogger("axon.token_swap")
+logger = logging.getLogger("velun.token_swap")
 
 # ── Uniswap V3 on Base ────────────────────────────────────────────────────────
 
@@ -470,7 +470,7 @@ async def execute_swap(
                 "gas_used":        receipt.gasUsed,
                 "message": (
                     f"✅ Conversión exitosa. Recibiste {actual_usdc:.2f} dólares digitales "
-                    f"en tu cuenta. Ya podés empezar a generar ingresos en AXON."
+                    f"en tu cuenta. Ya podés empezar a generar ingresos en VELUN."
                 ),
             }
         else:

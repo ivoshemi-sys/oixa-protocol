@@ -1,24 +1,24 @@
 """
-AXON Protocol — AgentOps Tracking Integration
+VELUN Protocol — AgentOps Tracking Integration
 
-Tracks all AXON Protocol interactions with AgentOps for observability,
+Tracks all VELUN Protocol interactions with AgentOps for observability,
 cost monitoring, and performance analytics across the agent economy.
 
 Installation:
     pip install agentops httpx
 
 Usage:
-    from axon_agentops import init_axon_agentops, axon_tracked_tools
+    from velun_agentops import init_velun_agentops, velun_tracked_tools
 
     # Initialize with your AgentOps API key
-    init_axon_agentops(api_key="your_agentops_key")
+    init_velun_agentops(api_key="your_agentops_key")
 
-    # Get AXON tools with AgentOps tracking built in
-    tools = axon_tracked_tools(axon_base_url="http://localhost:8000")
+    # Get VELUN tools with AgentOps tracking built in
+    tools = velun_tracked_tools(velun_base_url="http://localhost:8000")
 
     # Or use the tracking decorator on any function
-    from axon_agentops import track_axon_action
-    @track_axon_action(action_type="bid")
+    from velun_agentops import track_velun_action
+    @track_velun_action(action_type="bid")
     def my_bidding_logic(auction_id: str):
         ...
 
@@ -34,9 +34,9 @@ from typing import Any, Callable, Optional
 
 import httpx
 
-logger = logging.getLogger("axon.agentops")
+logger = logging.getLogger("velun.agentops")
 
-AXON_BASE_URL = "http://localhost:8000"
+VELUN_BASE_URL = "http://localhost:8000"
 _AGENTOPS_INITIALIZED = False
 
 
@@ -52,18 +52,18 @@ except ImportError:
 
 # ── Init ───────────────────────────────────────────────────────────────────────
 
-def init_axon_agentops(
+def init_velun_agentops(
     api_key:         Optional[str] = None,
     session_tags:    Optional[list] = None,
-    axon_base_url:   str = AXON_BASE_URL,
+    velun_base_url:   str = VELUN_BASE_URL,
 ) -> bool:
     """
-    Initialize AgentOps tracking for AXON Protocol interactions.
+    Initialize AgentOps tracking for VELUN Protocol interactions.
 
     Args:
         api_key:      AgentOps API key (or set AGENTOPS_API_KEY env var)
-        session_tags: Tags for this session e.g. ['axon', 'production', 'earning']
-        axon_base_url: AXON server URL
+        session_tags: Tags for this session e.g. ['velun', 'production', 'earning']
+        velun_base_url: VELUN server URL
 
     Returns:
         True if AgentOps initialized successfully, False if not installed.
@@ -74,13 +74,13 @@ def init_axon_agentops(
         return False
 
     try:
-        tags = session_tags or ["axon-protocol", "agent-economy"]
+        tags = session_tags or ["velun-protocol", "agent-economy"]
         if api_key:
             agentops.init(api_key=api_key, tags=tags)
         else:
             agentops.init(tags=tags)  # uses AGENTOPS_API_KEY env var
         _AGENTOPS_INITIALIZED = True
-        logger.info("[AgentOps] Initialized for AXON Protocol tracking")
+        logger.info("[AgentOps] Initialized for VELUN Protocol tracking")
         return True
     except Exception as e:
         logger.warning(f"[AgentOps] Init failed: {e}")
@@ -89,21 +89,21 @@ def init_axon_agentops(
 
 # ── Tracking decorator ─────────────────────────────────────────────────────────
 
-def track_axon_action(
-    action_type: str = "axon_action",
+def track_velun_action(
+    action_type: str = "velun_action",
     record_output: bool = True,
 ):
     """
-    Decorator: track any AXON-related function call with AgentOps.
+    Decorator: track any VELUN-related function call with AgentOps.
 
     Args:
         action_type: Label for this action in AgentOps dashboard
         record_output: Whether to record the return value
 
     Example:
-        @track_axon_action(action_type="bid")
+        @track_velun_action(action_type="bid")
         def place_my_bid(auction_id, amount):
-            return axon_api.place_bid(auction_id, "my_agent", "My Agent", amount)
+            return velun_api.place_bid(auction_id, "my_agent", "My Agent", amount)
     """
     def decorator(fn: Callable) -> Callable:
         @functools.wraps(fn)
@@ -122,7 +122,7 @@ def track_axon_action(
                 if _AGENTOPS_AVAILABLE and _AGENTOPS_INITIALIZED:
                     try:
                         agentops.record(agentops.ActionEvent(
-                            action_type=f"axon.{action_type}",
+                            action_type=f"velun.{action_type}",
                             params={"args": str(args)[:500], "kwargs": str(kwargs)[:500]},
                             returns=str(result)[:500] if record_output and result else None,
                             logs=f"elapsed_ms={elapsed_ms:.1f}",
@@ -134,9 +134,9 @@ def track_axon_action(
     return decorator
 
 
-# ── Tracked AXON API functions ─────────────────────────────────────────────────
+# ── Tracked VELUN API functions ─────────────────────────────────────────────────
 
-def _call(method: str, path: str, data: Optional[dict] = None, base_url: str = AXON_BASE_URL) -> dict:
+def _call(method: str, path: str, data: Optional[dict] = None, base_url: str = VELUN_BASE_URL) -> dict:
     with httpx.Client(timeout=15) as client:
         resp = client.request(method, f"{base_url}{path}", json=data)
         try:
@@ -164,28 +164,28 @@ def _make_tracked_tool(
             if _AGENTOPS_AVAILABLE and _AGENTOPS_INITIALIZED:
                 try:
                     agentops.record(agentops.ToolEvent(
-                        name=f"axon.{name}",
+                        name=f"velun.{name}",
                         params={"args": str(args)[:300], **{k: str(v)[:200] for k, v in kwargs.items()}},
                         returns=str(result)[:500] if result else None,
                         logs=json.dumps({
                             "elapsed_ms": round(elapsed_ms, 1),
                             "cost_usdc":  cost_usdc,
-                            "protocol":   "AXON",
+                            "protocol":   "VELUN",
                         }),
                     ))
                 except Exception:
                     pass
 
     tracked.__doc__  = description
-    tracked.__name__ = f"axon_{name}"
+    tracked.__name__ = f"velun_{name}"
     return tracked
 
 
 # ── Tracked tool factory ───────────────────────────────────────────────────────
 
-def axon_tracked_tools(base_url: str = AXON_BASE_URL) -> list:
+def velun_tracked_tools(base_url: str = VELUN_BASE_URL) -> list:
     """
-    Return AXON tools wrapped with AgentOps tracking.
+    Return VELUN tools wrapped with AgentOps tracking.
 
     Each tool call will appear in your AgentOps dashboard with:
     - Execution time
@@ -194,23 +194,23 @@ def axon_tracked_tools(base_url: str = AXON_BASE_URL) -> list:
     - Estimated USDC cost
 
     Usage:
-        tools = axon_tracked_tools()
+        tools = velun_tracked_tools()
         # Use tools with any LangChain/CrewAI/AutoGen agent
     """
 
     def list_auctions(status: str = "open", limit: int = 20) -> str:
-        """List open AXON auctions — find work to earn USDC."""
+        """List open VELUN auctions — find work to earn USDC."""
         return json.dumps(_call("GET", f"/api/v1/auctions?status={status}&limit={limit}", base_url=base_url))
 
     def place_bid(auction_id: str, bidder_id: str, bidder_name: str, amount: float) -> str:
-        """Bid on AXON auction (reverse auction — lowest wins). Cost: bid stake (20% of bid)."""
+        """Bid on VELUN auction (reverse auction — lowest wins). Cost: bid stake (20% of bid)."""
         return json.dumps(_call("POST", f"/api/v1/auctions/{auction_id}/bid", {
             "auction_id": auction_id, "bidder_id": bidder_id,
             "bidder_name": bidder_name, "amount": amount,
         }, base_url=base_url))
 
     def create_auction(rfi_description: str, max_budget: float, requester_id: str) -> str:
-        """Post a task to AXON — hire other agents. Cost: max_budget USDC locked in escrow."""
+        """Post a task to VELUN — hire other agents. Cost: max_budget USDC locked in escrow."""
         return json.dumps(_call("POST", "/api/v1/auctions", {
             "rfi_description": rfi_description,
             "max_budget":      max_budget,
@@ -219,26 +219,26 @@ def axon_tracked_tools(base_url: str = AXON_BASE_URL) -> list:
         }, base_url=base_url))
 
     def deliver_output(auction_id: str, agent_id: str, output: str) -> str:
-        """Deliver work for won AXON auction — triggers USDC payment release."""
+        """Deliver work for won VELUN auction — triggers USDC payment release."""
         return json.dumps(_call("POST", f"/api/v1/auctions/{auction_id}/deliver", {
             "agent_id": agent_id, "output": output,
         }, base_url=base_url))
 
     def check_earnings(agent_id: str) -> str:
-        """Check USDC earnings on AXON Protocol."""
+        """Check USDC earnings on VELUN Protocol."""
         return json.dumps(_call("GET", f"/api/v1/ledger/agent/{agent_id}", base_url=base_url))
 
     def find_spot_compute(capability: str, max_price_usdc: float = 1.0) -> str:
-        """Find spot compute on AXON — instant agent hire for delegation."""
+        """Find spot compute on VELUN — instant agent hire for delegation."""
         return json.dumps(_call("GET", f"/api/v1/spot/capacity?capability={capability}&max_price={max_price_usdc}", base_url=base_url))
 
     tool_defs = [
-        ("list_auctions",    "List AXON auctions to earn USDC — find work.",          list_auctions,    0.0),
-        ("place_bid",        "Bid on AXON auction to win task and earn USDC.",         place_bid,        0.0),
-        ("create_auction",   "Post task to AXON — hire agents with USDC escrow.",      create_auction,   0.0),
+        ("list_auctions",    "List VELUN auctions to earn USDC — find work.",          list_auctions,    0.0),
+        ("place_bid",        "Bid on VELUN auction to win task and earn USDC.",         place_bid,        0.0),
+        ("create_auction",   "Post task to VELUN — hire agents with USDC escrow.",      create_auction,   0.0),
         ("deliver_output",   "Deliver work to release USDC payment from escrow.",      deliver_output,   0.0),
-        ("check_earnings",   "Check USDC earnings on AXON Protocol.",                  check_earnings,   0.0),
-        ("find_spot_compute","Find spot compute on AXON for immediate delegation.",     find_spot_compute, 0.0),
+        ("check_earnings",   "Check USDC earnings on VELUN Protocol.",                  check_earnings,   0.0),
+        ("find_spot_compute","Find spot compute on VELUN for immediate delegation.",     find_spot_compute, 0.0),
     ]
 
     return [
@@ -249,9 +249,9 @@ def axon_tracked_tools(base_url: str = AXON_BASE_URL) -> list:
 
 # ── Session summary ────────────────────────────────────────────────────────────
 
-def end_axon_session(end_state: str = "Success") -> None:
+def end_velun_session(end_state: str = "Success") -> None:
     """
-    End the current AgentOps session for this AXON agent run.
+    End the current AgentOps session for this VELUN agent run.
 
     Args:
         end_state: "Success", "Fail", or "Indeterminate"

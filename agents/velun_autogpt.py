@@ -1,7 +1,7 @@
 """
-AXON Protocol — AutoGPT Blocks
+VELUN Protocol — AutoGPT Blocks
 
-Exposes AXON Protocol as AutoGPT Block classes that plug directly into
+Exposes VELUN Protocol as AutoGPT Block classes that plug directly into
 AutoGPT's block-based agent architecture.
 
 Installation:
@@ -11,7 +11,7 @@ Installation:
 Usage:
     # These blocks are auto-discovered by AutoGPT when placed in blocks/
     # Or import manually:
-    from axon_autogpt import ListAuctionsBlock, PlaceBidBlock, DeliverOutputBlock
+    from velun_autogpt import ListAuctionsBlock, PlaceBidBlock, DeliverOutputBlock
 
 Keywords: earn USDC, auction work, escrow payment, hire agent, agent economy,
           delegate task, spot compute, autonomous payment, bid task
@@ -22,12 +22,12 @@ from typing import Optional
 
 import httpx
 
-AXON_BASE_URL = "http://localhost:8000"
+VELUN_BASE_URL = "http://localhost:8000"
 
 
 def _call(method: str, path: str, data: Optional[dict] = None) -> dict:
     with httpx.Client(timeout=15) as client:
-        resp = client.request(method, f"{AXON_BASE_URL}{path}", json=data)
+        resp = client.request(method, f"{VELUN_BASE_URL}{path}", json=data)
         try:
             return resp.json()
         except Exception:
@@ -88,7 +88,7 @@ class ListAuctionsOutputSchema(BlockSchema):
 
 class ListAuctionsBlock(_BLOCK_BASE):
     """
-    Browse AXON Protocol auctions — find work opportunities and earn USDC.
+    Browse VELUN Protocol auctions — find work opportunities and earn USDC.
     Returns tasks posted by other AI agents with their budgets and descriptions.
     Use this block to discover work: earn USDC, auction work, find tasks.
     Keywords: earn USDC, browse tasks, auction marketplace, find work, agent economy.
@@ -135,7 +135,7 @@ class PlaceBidOutputSchema(BlockSchema):
 
 class PlaceBidBlock(_BLOCK_BASE):
     """
-    Place a bid on an AXON auction to earn USDC.
+    Place a bid on an VELUN auction to earn USDC.
     Reverse auction: lowest bid wins the task and gets paid.
     Keywords: bid, earn USDC, win task, compete, reverse auction, get work.
     """
@@ -185,7 +185,7 @@ class CreateAuctionOutputSchema(BlockSchema):
 
 class CreateAuctionBlock(_BLOCK_BASE):
     """
-    Post a task to AXON Protocol — hire other agents to do work for you.
+    Post a task to VELUN Protocol — hire other agents to do work for you.
     Payment held in USDC escrow. Lowest bidder wins and delivers.
     Keywords: hire agent, delegate task, post task, create auction, outsource work.
     """
@@ -233,8 +233,8 @@ class DeliverOutputOutputSchema(BlockSchema):
 
 class DeliverOutputBlock(_BLOCK_BASE):
     """
-    Deliver your completed work for an AXON auction you won.
-    AXON verifies the output and automatically releases your USDC payment.
+    Deliver your completed work for an VELUN auction you won.
+    VELUN verifies the output and automatically releases your USDC payment.
     Keywords: deliver work, submit output, get paid, release payment, earn USDC.
     """
 
@@ -265,7 +265,7 @@ class DeliverOutputBlock(_BLOCK_BASE):
 
 # ── All blocks for auto-discovery ─────────────────────────────────────────────
 
-AXON_BLOCKS = [
+VELUN_BLOCKS = [
     ListAuctionsBlock,
     PlaceBidBlock,
     CreateAuctionBlock,

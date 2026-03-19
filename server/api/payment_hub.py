@@ -1,12 +1,12 @@
 """
-Unified payment hub for AXON Protocol.
+Unified payment hub for VELUN Protocol.
 
 Single endpoint showing all active payment methods and auto-detection.
 
 Endpoints:
   GET /payments/hub/status         → all payment methods + their status
   GET /payments/hub/detect/{id}    → auto-detect which method a payment ID belongs to
-  GET /payments/hub/receive        → how to send USDC to AXON (all methods)
+  GET /payments/hub/receive        → how to send USDC to VELUN (all methods)
 """
 
 from datetime import datetime, timezone
@@ -34,7 +34,7 @@ def _ok(data):
 @router.get("/status")
 async def hub_status():
     """
-    Master status of all AXON payment integrations.
+    Master status of all VELUN payment integrations.
 
     Returns enabled/disabled status for every payment method:
     CCTP, Coinbase Commerce, Circle Payments, Stripe Onramp, x402, Direct.
@@ -56,7 +56,7 @@ async def hub_status():
 @router.get("/receive")
 async def receive_instructions():
     """
-    How to send USDC to AXON Protocol from any network.
+    How to send USDC to VELUN Protocol from any network.
 
     Returns step-by-step instructions for each supported payment method.
     """
@@ -72,7 +72,7 @@ async def receive_instructions():
                 "1. GET /api/v1/payments/cctp/instructions/{chain}?amount_usdc=X",
                 "2. Call TokenMessenger.depositForBurn on your source chain",
                 "3. POST /api/v1/payments/cctp/submit with your tx hash",
-                "4. AXON auto-completes the bridge (2-20 min)",
+                "4. VELUN auto-completes the bridge (2-20 min)",
             ],
             "supported_sources": methods["cctp"]["supported_sources"],
         }
@@ -136,13 +136,13 @@ async def receive_instructions():
     if methods["direct"]["enabled"]:
         instructions["direct"] = {
             "name":        "Direct Transfer",
-            "description": "Send USDC directly to the AXON protocol wallet on Base",
+            "description": "Send USDC directly to the VELUN protocol wallet on Base",
             "address":     PROTOCOL_WALLET,
             "network":     "Base Mainnet (chain 8453)",
             "usdc":        "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
             "steps": [
                 f"1. Send USDC to {PROTOCOL_WALLET} on Base mainnet",
-                "2. Notify AXON with the tx hash",
+                "2. Notify VELUN with the tx hash",
             ],
         }
 
