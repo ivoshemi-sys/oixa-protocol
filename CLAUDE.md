@@ -1,20 +1,20 @@
-# VELUN Protocol — Instrucciones para Claude Code
+# OIXA Protocol — Instrucciones para Claude Code
 
 > Este archivo es tu contrato de trabajo. Léelo completo antes de escribir una sola línea de código.
-> Tu objetivo es construir y dejar OPERATIVO el servidor central de VELUN Protocol en este Mac mini.
+> Tu objetivo es construir y dejar OPERATIVO el servidor central de OIXA Protocol en este Mac mini.
 > No preguntes. Decide. Avanza. Si algo es ambiguo, elige la opción más simple que funcione.
 
 ---
 
 ## Contexto del proyecto
 
-VELUN Protocol es el protocolo abierto donde agentes de IA contratan a otros agentes de IA de forma autónoma, con garantías económicas reales.
+OIXA Protocol es el protocolo abierto donde agentes de IA contratan a otros agentes de IA de forma autónoma, con garantías económicas reales.
 
-**Repositorio:** github.com/ivoshemi-sys/velun-protocol
+**Repositorio:** github.com/ivoshemi-sys/oixa-protocol
 **Dueño:** Ivan Shemi
 **Stack de agentes:** CEO (Claude Opus) + 12 agentes (Sonnet/Haiku) corriendo en OpenClaw
 **OpenClaw WebSocket:** ws://127.0.0.1:18789
-**Telegram bot:** @Velunprotocol_bot
+**Telegram bot:** @Oixaprotocol_bot
 
 El servidor que vas a construir es el cerebro del protocolo. Conecta a todos los agentes, maneja las subastas, verifica outputs y registra todo en un ledger.
 
@@ -25,7 +25,7 @@ El servidor que vas a construir es el cerebro del protocolo. Conecta a todos los
 ### Estructura de carpetas (créala exactamente así)
 
 ```
-velun-protocol/
+oixa-protocol/
 ├── CLAUDE.md                  ← este archivo
 ├── README.md                  ← ya existe, no tocar
 ├── WHITEPAPER.md              ← ya existe, no tocar
@@ -88,13 +88,13 @@ rich==13.8.1
 Variables de entorno con defaults razonables:
 
 ```python
-VELUN_HOST = "0.0.0.0"
-VELUN_PORT = 8000
-VELUN_DEBUG = true
+OIXA_HOST = "0.0.0.0"
+OIXA_PORT = 8000
+OIXA_DEBUG = true
 OPENCLAW_URL = "ws://127.0.0.1:18789"
 TELEGRAM_BOT_TOKEN = ""          # se carga del .env
 TELEGRAM_OWNER_ID = 0            # Telegram ID de Ivan
-DB_PATH = "./velun.db"
+DB_PATH = "./oixa.db"
 COMMISSION_RATE = 0.05           # 5% por transacción
 MAX_REQUESTS_PER_MINUTE = 50     # rate limit global a Anthropic API
 STAKE_PERCENTAGE = 0.20          # 20% del bid como stake
@@ -406,13 +406,13 @@ async def lifespan(app: FastAPI):
     # STARTUP
     await init_db()
     await openclaw_client.connect()  # no falla si OpenClaw no está
-    print("🚀 VELUN Protocol server running")
+    print("🚀 OIXA Protocol server running")
     yield
     # SHUTDOWN
-    print("🛑 VELUN Protocol server stopped")
+    print("🛑 OIXA Protocol server stopped")
 
 app = FastAPI(
-    title="VELUN Protocol",
+    title="OIXA Protocol",
     description="The connective tissue of the agent economy",
     version="0.1.0",
     lifespan=lifespan
@@ -432,7 +432,7 @@ app.include_router(ledger_router, prefix="/api/v1")
 @app.get("/")
 async def root():
     return {
-        "protocol": "VELUN",
+        "protocol": "OIXA",
         "version": "0.1.0",
         "status": "operational",
         "phase": 1,
@@ -481,11 +481,11 @@ Errores:
 Usar este formato para todos los IDs:
 ```python
 import uuid
-id = f"velun_{prefix}_{uuid.uuid4().hex[:12]}"
+id = f"oixa_{prefix}_{uuid.uuid4().hex[:12]}"
 # Ejemplos:
-# velun_offer_a3f9b2c1d4e5
-# velun_auction_7f8e9d2c1b3a
-# velun_bid_c2d3e4f5a6b7
+# oixa_offer_a3f9b2c1d4e5
+# oixa_auction_7f8e9d2c1b3a
+# oixa_bid_c2d3e4f5a6b7
 ```
 
 Prefijos: `offer`, `auction`, `bid`, `escrow`, `verify`, `ledger`
@@ -498,22 +498,22 @@ Prefijos: `offer`, `auction`, `bid`, `escrow`, `verify`, `ledger`
 ```bash
 #!/bin/bash
 cd "$(dirname "$0")/.."
-echo "🚀 Starting VELUN Protocol server..."
+echo "🚀 Starting OIXA Protocol server..."
 source .env 2>/dev/null || true
 cd server
 pip install -r requirements.txt -q
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
-echo $! > ../velun.pid
-echo "✅ VELUN Protocol running on http://localhost:8000"
+echo $! > ../oixa.pid
+echo "✅ OIXA Protocol running on http://localhost:8000"
 echo "📊 Docs: http://localhost:8000/docs"
 ```
 
 ### scripts/stop.sh
 ```bash
 #!/bin/bash
-if [ -f velun.pid ]; then
-    kill $(cat velun.pid) && rm velun.pid
-    echo "🛑 VELUN Protocol stopped"
+if [ -f oixa.pid ]; then
+    kill $(cat oixa.pid) && rm oixa.pid
+    echo "🛑 OIXA Protocol stopped"
 else
     echo "No PID file found"
 fi
@@ -532,7 +532,7 @@ curl -s http://localhost:8000/health | python3 -m json.tool 2>/dev/null || echo 
 Crear este archivo con instrucciones para el CEO sobre cómo usar el servidor:
 
 ```markdown
-# VELUN Protocol API — Guía para agentes
+# OIXA Protocol API — Guía para agentes
 
 ## Base URL
 http://localhost:8000/api/v1
@@ -554,13 +554,13 @@ http://localhost:8000/api/v1
 ## .env.example
 
 ```
-VELUN_HOST=0.0.0.0
-VELUN_PORT=8000
-VELUN_DEBUG=true
+OIXA_HOST=0.0.0.0
+OIXA_PORT=8000
+OIXA_DEBUG=true
 OPENCLAW_URL=ws://127.0.0.1:18789
 TELEGRAM_BOT_TOKEN=tu_token_aqui
 TELEGRAM_OWNER_ID=tu_telegram_id
-DB_PATH=./velun.db
+DB_PATH=./oixa.db
 COMMISSION_RATE=0.05
 MAX_REQUESTS_PER_MINUTE=50
 STAKE_PERCENTAGE=0.20
@@ -629,7 +629,7 @@ def calculate_commission(amount: float) -> float:
         return amount * 0.02      # 2% para deals grandes
 ```
 
-Registrar cada comisión en el ledger con `transaction_type = "commission"` y `to_agent = "velun_protocol"`.
+Registrar cada comisión en el ledger con `transaction_type = "commission"` y `to_agent = "oixa_protocol"`.
 
 ### Capa 2: Yield pasivo sobre stakes
 
@@ -644,7 +644,7 @@ Implementar en Fase 1:
 SIMULATED_YIELD_APY = 0.04  # 4% anual, conservador
 ```
 
-### Capa 3: AIPI — VELUN Intelligence Price Index
+### Capa 3: AIPI — OIXA Intelligence Price Index
 
 Se activa automáticamente cuando hay más de 100 transacciones en el ledger.
 
@@ -670,7 +670,7 @@ PROTOCOL_WALLET = os.getenv("PROTOCOL_WALLET", "")  # wallet de Ivan para recibi
 PROTOCOL_WALLET_NETWORK = os.getenv("PROTOCOL_WALLET_NETWORK", "base")  # Base mainnet en Fase 2
 ```
 
-En Fase 1: las comisiones se registran en el ledger con `to_agent = "velun_protocol"` pero no se transfieren a ningún lado (simulado).
+En Fase 1: las comisiones se registran en el ledger con `to_agent = "oixa_protocol"` pero no se transfieren a ningún lado (simulado).
 En Fase 2: se transfieren automáticamente a `PROTOCOL_WALLET` en Base via USDC.
 
 ### Tabla de comisiones en la DB
@@ -713,7 +713,7 @@ El endpoint `/health` debe incluir:
 - **OpenClaw es opcional.** Si no está corriendo, el servidor arranca igual en modo degradado. Loguear un warning, no un error.
 - **No preguntes.** Si algo no está especificado, usa el criterio más simple. Prefiere código que funciona sobre código perfecto.
 - **Loguear todo** con `rich` para que Ivan pueda ver qué está pasando en tiempo real.
-- **Un solo archivo de DB:** `velun.db` en la carpeta `server/`. No usar archivos separados por módulo.
+- **Un solo archivo de DB:** `oixa.db` en la carpeta `server/`. No usar archivos separados por módulo.
 - **Commits al repo** al terminar cada módulo principal (offers, auctions, escrow, verify, ledger).
 
 ---
@@ -721,15 +721,15 @@ El endpoint `/health` debe incluir:
 ## Contexto del equipo de agentes
 
 El servidor va a ser usado por:
-- **VELUN CEO** (Claude Opus) — orquesta todo el equipo, toma decisiones
+- **OIXA CEO** (Claude Opus) — orquesta todo el equipo, toma decisiones
 - **4 Directores** (Claude Sonnet) — Protocol, Ops, Growth, Intel
 - **8 Agentes operativos** (Haiku/Sonnet) — ejecutan tareas concretas
 
-Todos se comunican vía la API REST de este servidor. El CEO es el primer usuario de VELUN Protocol — usa el protocolo que está construyendo.
+Todos se comunican vía la API REST de este servidor. El CEO es el primer usuario de OIXA Protocol — usa el protocolo que está construyendo.
 
 Presupuesto operativo total: ~$0.66/día. El rate limiter debe respetar esto.
 
 ---
 
-*VELUN Protocol — Founded March 18, 2026 — Ivan Shemi*
+*OIXA Protocol — Founded March 18, 2026 — Ivan Shemi*
 *"The connective tissue of the agent economy"*

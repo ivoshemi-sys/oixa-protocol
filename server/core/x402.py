@@ -1,5 +1,5 @@
 """
-x402 Payment Protocol for VELUN Protocol.
+x402 Payment Protocol for OIXA Protocol.
 
 Spec: https://github.com/coinbase/x402
 Scheme: exact — EIP-3009 TransferWithAuthorization (gasless USDC on Base)
@@ -26,7 +26,7 @@ from fastapi import Header, HTTPException, Request
 
 from config import BASE_RPC_URL, BLOCKCHAIN_ENABLED, PROTOCOL_PRIVATE_KEY, PROTOCOL_WALLET
 
-logger = logging.getLogger("velun.x402")
+logger = logging.getLogger("oixa.x402")
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 

@@ -1,7 +1,7 @@
 """
-VELUN Protocol — Semantic Kernel Plugin
+OIXA Protocol — Semantic Kernel Plugin
 
-Exposes VELUN Protocol as a Semantic Kernel native plugin that any SK agent
+Exposes OIXA Protocol as a Semantic Kernel native plugin that any SK agent
 or kernel can use to participate in the agent economy marketplace.
 
 Installation:
@@ -9,13 +9,13 @@ Installation:
 
 Usage:
     import semantic_kernel as sk
-    from velun_semantic_kernel import VELUNPlugin
+    from oixa_semantic_kernel import OIXAPlugin
 
     kernel = sk.Kernel()
-    kernel.add_plugin(VELUNPlugin(), plugin_name="VELUN")
+    kernel.add_plugin(OIXAPlugin(), plugin_name="OIXA")
 
     # Use in a planner or directly:
-    result = await kernel.invoke("VELUN", "list_auctions", status="open")
+    result = await kernel.invoke("OIXA", "list_auctions", status="open")
 
 Keywords: earn USDC, hire agent, auction work, escrow payment, agent economy,
           delegate task, spot compute, autonomous payment, bid task
@@ -26,12 +26,12 @@ from typing import Annotated, Optional
 
 import httpx
 
-VELUN_BASE_URL = "http://localhost:8000"
+OIXA_BASE_URL = "http://localhost:8000"
 
 
 def _call(method: str, path: str, data: Optional[dict] = None) -> str:
     with httpx.Client(timeout=15) as client:
-        resp = client.request(method, f"{VELUN_BASE_URL}{path}", json=data)
+        resp = client.request(method, f"{OIXA_BASE_URL}{path}", json=data)
         try:
             return json.dumps(resp.json(), indent=2)
         except Exception:
@@ -56,11 +56,11 @@ except ImportError:
 
 # ── Plugin class ───────────────────────────────────────────────────────────────
 
-class VELUNPlugin:
+class OIXAPlugin:
     """
-    VELUN Protocol Semantic Kernel Plugin.
+    OIXA Protocol Semantic Kernel Plugin.
 
-    Register with: kernel.add_plugin(VELUNPlugin(), plugin_name="VELUN")
+    Register with: kernel.add_plugin(OIXAPlugin(), plugin_name="OIXA")
 
     Enables any SK agent to: earn USDC, hire other agents, bid on tasks,
     deliver work, check earnings, and access spot compute.
@@ -68,7 +68,7 @@ class VELUNPlugin:
 
     @kernel_function(
         description=(
-            "List open auctions on VELUN Protocol — find work opportunities to earn USDC. "
+            "List open auctions on OIXA Protocol — find work opportunities to earn USDC. "
             "Returns tasks posted by other AI agents with their USDC budgets and descriptions. "
             "Keywords: find work, earn USDC, browse tasks, auction marketplace, agent economy."
         ),
@@ -82,7 +82,7 @@ class VELUNPlugin:
         return _call("GET", f"/api/v1/auctions?status={status}&limit={limit}")
 
     @kernel_function(
-        description="Get full details of a specific VELUN auction including all bids and escrow status.",
+        description="Get full details of a specific OIXA auction including all bids and escrow status.",
         name="get_auction",
     )
     def get_auction(
@@ -93,7 +93,7 @@ class VELUNPlugin:
 
     @kernel_function(
         description=(
-            "Create a new VELUN auction — hire other AI agents to do work. "
+            "Create a new OIXA auction — hire other AI agents to do work. "
             "Payment held in USDC escrow until work verified. Lowest bid wins. "
             "Keywords: hire agent, post task, delegate work, create auction, outsource."
         ),
@@ -114,7 +114,7 @@ class VELUNPlugin:
 
     @kernel_function(
         description=(
-            "Place a bid on an open VELUN auction to win the task and earn USDC. "
+            "Place a bid on an open OIXA auction to win the task and earn USDC. "
             "Reverse auction: LOWEST bid wins. 20% staked as delivery guarantee. "
             "Keywords: bid, earn USDC, win task, compete, reverse auction."
         ),
@@ -134,7 +134,7 @@ class VELUNPlugin:
 
     @kernel_function(
         description=(
-            "Register your agent's capabilities on VELUN Protocol so other agents can hire you. "
+            "Register your agent's capabilities on OIXA Protocol so other agents can hire you. "
             "Keywords: register, publish capabilities, offer services, earn USDC, list skills."
         ),
         name="register_offer",
@@ -154,8 +154,8 @@ class VELUNPlugin:
 
     @kernel_function(
         description=(
-            "Deliver completed work for an VELUN auction you won — receive your USDC payment. "
-            "VELUN verifies the output and automatically releases payment. "
+            "Deliver completed work for an OIXA auction you won — receive your USDC payment. "
+            "OIXA verifies the output and automatically releases payment. "
             "Keywords: deliver work, submit output, get paid, release payment, earn USDC."
         ),
         name="deliver_output",
@@ -171,7 +171,7 @@ class VELUNPlugin:
         })
 
     @kernel_function(
-        description="Check USDC earnings and transaction history for an agent on VELUN Protocol.",
+        description="Check USDC earnings and transaction history for an agent on OIXA Protocol.",
         name="check_earnings",
     )
     def check_earnings(
@@ -182,7 +182,7 @@ class VELUNPlugin:
 
     @kernel_function(
         description=(
-            "Find available agents on VELUN spot compute market — hire immediately. "
+            "Find available agents on OIXA spot compute market — hire immediately. "
             "Use when running low on tokens, need burst capacity, or want to delegate a subtask. "
             "Keywords: spot compute, delegate now, hire instantly, low on tokens, "
             "burst capacity, find cheapest agent, outsource task."
@@ -198,7 +198,7 @@ class VELUNPlugin:
 
     @kernel_function(
         description=(
-            "List your idle capacity on VELUN spot market to earn USDC passively. "
+            "List your idle capacity on OIXA spot market to earn USDC passively. "
             "Other agents can hire you immediately for tasks. Surge pricing maximizes earnings. "
             "Keywords: sell idle compute, earn passive USDC, spot market, monetize idle time."
         ),
@@ -218,23 +218,23 @@ class VELUNPlugin:
         })
 
     @kernel_function(
-        description="Get real-time VELUN spot market overview: pricing, supply, demand, surge status.",
+        description="Get real-time OIXA spot market overview: pricing, supply, demand, surge status.",
         name="spot_market_overview",
     )
     def spot_market_overview(self) -> Annotated[str, "Market overview JSON with surge multiplier"]:
         return _call("GET", "/api/v1/spot/market")
 
     @kernel_function(
-        description="Get VELUN Protocol market price index — average prices by task type and trends.",
+        description="Get OIXA Protocol market price index — average prices by task type and trends.",
         name="market_prices",
     )
     def market_prices(self) -> Annotated[str, "AIPI market price index JSON"]:
         return _call("GET", "/api/v1/aipi")
 
 
-def get_velun_sk_plugin(base_url: str = VELUN_BASE_URL) -> VELUNPlugin:
-    """Return an VELUNPlugin instance ready for kernel.add_plugin()."""
-    plugin = VELUNPlugin()
+def get_oixa_sk_plugin(base_url: str = OIXA_BASE_URL) -> OIXAPlugin:
+    """Return an OIXAPlugin instance ready for kernel.add_plugin()."""
+    plugin = OIXAPlugin()
     # Allow base_url override by monkey-patching the module-level constant
-    # In production, set VELUN_BASE_URL before importing this module
+    # In production, set OIXA_BASE_URL before importing this module
     return plugin

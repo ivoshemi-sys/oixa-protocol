@@ -105,7 +105,7 @@ async def open_dispute(body: DisputeOpen):
     fee_amount = round(escrow["amount"] * DISPUTE_FEE_RATE, 6)
 
     # ── Create dispute ────────────────────────────────────────────────────────
-    dispute_id = f"velun_dispute_{uuid.uuid4().hex[:12]}"
+    dispute_id = f"oixa_dispute_{uuid.uuid4().hex[:12]}"
     now_str    = now.isoformat()
 
     await db.execute(
@@ -127,10 +127,10 @@ async def open_dispute(body: DisputeOpen):
            (id, transaction_type, from_agent, to_agent, amount, currency, auction_id, description, created_at)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (
-            f"velun_ledger_{uuid.uuid4().hex[:12]}",
+            f"oixa_ledger_{uuid.uuid4().hex[:12]}",
             "dispute_fee",
             body.opened_by,
-            "velun_protocol",
+            "oixa_protocol",
             fee_amount,
             "USDC",
             body.auction_id,
@@ -296,6 +296,6 @@ async def _run_arbiter(dispute_id: str):
         await arbitrate_dispute(dispute_id)
     except Exception as e:
         import logging
-        logging.getLogger("velun.disputes").error(
+        logging.getLogger("oixa.disputes").error(
             f"Arbiter task failed for {dispute_id}: {e}", exc_info=True
         )

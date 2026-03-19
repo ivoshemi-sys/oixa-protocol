@@ -1,8 +1,8 @@
 """
-VELUN Protocol — Onboarding API
+OIXA Protocol — Onboarding API
 
 Endpoints conversacionales para guiar a nuevos agentes/usuarios a través
-del proceso de activación de VELUN Protocol.
+del proceso de activación de OIXA Protocol.
 
 Lenguaje simple en todas las respuestas:
   wallet       → cuenta de cobro
@@ -17,7 +17,7 @@ Endpoints:
   GET  /onboarding/wallet/{addr}  → Detecta estado de una wallet
   POST /onboarding/swap/quote     → Cotiza conversión a dólares digitales
   POST /onboarding/swap/execute   → Ejecuta conversión
-  POST /onboarding/register       → Registra agente en VELUN
+  POST /onboarding/register       → Registra agente en OIXA
   POST /onboarding/chat           → Responde preguntas del onboarding
   GET  /onboarding/status/{id}    → Estado de sesión de onboarding
 """
@@ -47,7 +47,7 @@ from database import get_db
 router = APIRouter(prefix="/onboarding", tags=["Onboarding"])
 
 _TS = lambda: datetime.now(timezone.utc).isoformat()
-_ID = lambda: f"velun_ob_{uuid.uuid4().hex[:12]}"
+_ID = lambda: f"oixa_ob_{uuid.uuid4().hex[:12]}"
 
 
 # ── Models ────────────────────────────────────────────────────────────────────
@@ -98,7 +98,7 @@ async def start_onboarding(body: OnboardingStartRequest):
 
     Si no tenés cuenta de cobro, te la generamos.
     Si tenés monedas, te proponemos la conversión.
-    Si ya tenés dólares digitales, te registramos en VELUN.
+    Si ya tenés dólares digitales, te registramos en OIXA.
     """
     state_data = await detect_agent_state(
         wallet_address=body.wallet_address,
@@ -148,7 +148,7 @@ async def start_onboarding(body: OnboardingStartRequest):
             "has_wallet":       bool(body.wallet_address),
             "current_usdc":     state_data["context"].get("current_usdc", 0.0),
             "swappable_usd":    state_data["context"].get("swappable_usd", 0.0),
-            "is_registered":    state_data["is_registered_velun"],
+            "is_registered":    state_data["is_registered_oixa"],
             "total_earnings":   state_data["total_earnings_usdc"],
         },
     }
@@ -160,7 +160,7 @@ async def create_wallet():
     Genera una nueva cuenta de cobro en Base mainnet.
 
     ⚠️ IMPORTANTE: Guardá la clave secreta en un lugar seguro.
-    VELUN nunca la almacena — si la perdés, perdés acceso a tu cuenta.
+    OIXA nunca la almacena — si la perdés, perdés acceso a tu cuenta.
     """
     from core.token_swap import generate_wallet
     try:
@@ -187,7 +187,7 @@ async def create_wallet():
         ),
         "next_step": "fund_wallet",
         "instructions": (
-            "Para activar VELUN necesitás cargar tu cuenta con dólares digitales. "
+            "Para activar OIXA necesitás cargar tu cuenta con dólares digitales. "
             "Con $2-5 ya podés empezar. Podés transferir desde Coinbase, "
             "Binance, o cualquier exchange."
         ),
@@ -226,7 +226,7 @@ async def get_wallet_state(wallet_address: str, channel: str = "terminal"):
         "dolares_digitales": round(state_data["context"].get("current_usdc", 0), 4),
         "convertible_usd":   round(state_data["context"].get("swappable_usd", 0), 2),
         "monedas":       tokens,
-        "registrado_en_velun": state_data["is_registered_velun"],
+        "registrado_en_oixa": state_data["is_registered_oixa"],
         "ganancias_totales":  round(state_data["total_earnings_usdc"], 4),
     }
 
@@ -341,10 +341,10 @@ async def execute_swap_endpoint(body: SwapExecuteRequest):
                 "texto_recibidos": _fmt_usd(usdc_received),
             },
             "message":   result["message"],
-            "next_step": "register_velun",
+            "next_step": "register_oixa",
             "next_message": (
                 f"Ahora tenés {_fmt_usd(usdc_received)} disponibles. "
-                "¿Querés que active tu agente en VELUN para empezar a generar ingresos?"
+                "¿Querés que active tu agente en OIXA para empezar a generar ingresos?"
             ),
             "opciones": ["✅ Activar mi agente ahora", "⏸️ Activar después"],
         }
@@ -356,10 +356,10 @@ async def execute_swap_endpoint(body: SwapExecuteRequest):
         }
 
 
-@router.post("/register", summary="Activar agente en VELUN Protocol")
+@router.post("/register", summary="Activar agente en OIXA Protocol")
 async def register_agent(body: RegisterRequest):
     """
-    Registra el agente en VELUN Protocol y lo pone disponible para recibir proyectos.
+    Registra el agente en OIXA Protocol y lo pone disponible para recibir proyectos.
     Se llama después de que el usuario confirma que quiere activarse.
     """
     # Normalize capabilities to friendly names
@@ -392,8 +392,8 @@ async def register_agent(body: RegisterRequest):
     if result["success"]:
         # Notify via Telegram if configured
         try:
-            from core.telegram_notifier import notify_velun_event
-            await notify_velun_event(
+            from core.telegram_notifier import notify_oixa_event
+            await notify_oixa_event(
                 f"🎉 Nuevo agente activado: {body.agent_name}\n"
                 f"Capacidades: {', '.join(normalized_caps)}\n"
                 f"Precio base: {_fmt_usd(body.price_per_unit)}/tarea"
@@ -487,7 +487,7 @@ async def onboarding_chat(body: ChatRequest):
             "success": True,
             "type":    "faq",
             "message": (
-                "💰 En VELUN los proyectos pagan entre $0.01 y $100+ por tarea.\n\n"
+                "💰 En OIXA los proyectos pagan entre $0.01 y $100+ por tarea.\n\n"
                 "Depende de tu especialidad:\n"
                 "• Análisis de texto: $0.02 - $0.50 por análisis\n"
                 "• Revisión de código: $0.10 - $5.00 por revisión\n"
@@ -518,7 +518,7 @@ async def onboarding_chat(body: ChatRequest):
             "Puedo ayudarte con:\n"
             "• Crear tu cuenta de cobro\n"
             "• Convertir tus monedas a dólares digitales\n"
-            "• Activar tu agente en VELUN\n"
+            "• Activar tu agente en OIXA\n"
             "• Responder preguntas sobre el sistema\n\n"
             "¿Qué necesitás?"
         ),
@@ -526,7 +526,7 @@ async def onboarding_chat(body: ChatRequest):
             "🆕 Crear cuenta de cobro",
             "💱 Convertir monedas",
             "🚀 Activar mi agente",
-            "❓ Cómo funciona VELUN",
+            "❓ Cómo funciona OIXA",
         ],
     }
 

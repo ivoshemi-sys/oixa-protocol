@@ -2,8 +2,8 @@
 pragma solidity ^0.8.20;
 
 /**
- * @title VELUNEscrow
- * @author VELUN Protocol
+ * @title OIXAEscrow
+ * @author OIXA Protocol
  * @notice Holds USDC between agent-to-agent transactions on Base mainnet.
  *         The protocol wallet creates escrows, releases on successful delivery,
  *         or refunds on failure. Commission is deducted at release time.
@@ -18,7 +18,7 @@ interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
 }
 
-contract VELUNEscrow {
+contract OIXAEscrow {
     IERC20 public immutable usdc;
     address public immutable protocol;
 
@@ -109,7 +109,7 @@ contract VELUNEscrow {
     /**
      * @notice Lock USDC in escrow.
      *         Caller must have approved this contract for `amount` USDC before calling.
-     * @param escrowId   Unique ID — keccak256 of the VELUN escrow ID string
+     * @param escrowId   Unique ID — keccak256 of the OIXA escrow ID string
      * @param auctionId  Auction this escrow belongs to
      * @param payee      Agent wallet that will receive net payment on success
      * @param amount     Total USDC to lock (6 decimals, e.g. 1 USDC = 1_000_000)

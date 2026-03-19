@@ -38,7 +38,7 @@ _auto_release_task = None
 async def lifespan(app: FastAPI):
     global _auto_release_task
 
-    logger.info("VELUN Protocol starting up...")
+    logger.info("OIXA Protocol starting up...")
     await init_db()
     logger.info("Database initialized")
 
@@ -65,7 +65,7 @@ async def lifespan(app: FastAPI):
         f"DB: {db_backend} | OpenClaw: {openclaw_client.connected} | "
         f"Escrow: {chain_mode} | DisputeWindow: {DISPUTE_WINDOW_MINUTES}m | Logs: {LOG_DIR}"
     )
-    logger.info("🚀 VELUN Protocol server running")
+    logger.info("🚀 OIXA Protocol server running")
 
     from core.telegram_notifier import notify_server_start
     await notify_server_start("Base mainnet" if BLOCKCHAIN_ENABLED else "simulated")
@@ -79,15 +79,15 @@ async def lifespan(app: FastAPI):
             await _auto_release_task
         except asyncio.CancelledError:
             pass
-    logger.info("🛑 VELUN Protocol server stopped")
+    logger.info("🛑 OIXA Protocol server stopped")
 
 
 app = FastAPI(
-    title="VELUN Protocol",
+    title="OIXA Protocol",
     description="""
 **The connective tissue of the agent economy.**
 
-VELUN Protocol is an open marketplace where AI agents hire other AI agents using
+OIXA Protocol is an open marketplace where AI agents hire other AI agents using
 **USDC escrow on Base mainnet**. Agents post tasks (RFIs), others bid in reverse
 auctions, and payment is released automatically upon cryptographic verification.
 
@@ -113,7 +113,7 @@ hire AI agent · autonomous payment · CCTP bridge · x402 micropayment
 """,
     version=PROTOCOL_VERSION,
     lifespan=lifespan,
-    contact={"name": "Ivan Shemi", "url": "https://github.com/ivoshemi-sys/velun-protocol"},
+    contact={"name": "Ivan Shemi", "url": "https://github.com/ivoshemi-sys/oixa-protocol"},
     license_info={"name": "MIT"},
     openapi_tags=[
         {"name": "Auctions",          "description": "Reverse auction marketplace — post tasks, bid, earn USDC"},
@@ -131,7 +131,7 @@ hire AI agent · autonomous payment · CCTP bridge · x402 micropayment
         {"name": "Discovery",         "description": "AI agent auto-discovery (MCP, A2A, OpenAI plugin)"},
         {"name": "Spot Compute",      "description": "Spot compute market — agents sell idle capacity, surge pricing"},
         {"name": "A2A",               "description": "Google Agent2Agent protocol — interoperable with 60+ A2A partners"},
-        {"name": "Onboarding",        "description": "Onboarding conversacional — activa VELUN en lenguaje simple, swap automático"},
+        {"name": "Onboarding",        "description": "Onboarding conversacional — activa OIXA en lenguaje simple, swap automático"},
         {"name": "Admin",             "description": "Protocol administration (pause, daily limits)"},
     ],
 )
@@ -170,7 +170,7 @@ async def root():
     from datetime import datetime, timezone
     escrow_mode = "base_mainnet" if BLOCKCHAIN_ENABLED else "simulated"
     return {
-        "protocol":              "VELUN",
+        "protocol":              "OIXA",
         "version":               PROTOCOL_VERSION,
         "status":                "operational",
         "phase":                 2 if BLOCKCHAIN_ENABLED else 1,

@@ -1,5 +1,5 @@
 """
-Admin API for VELUN Protocol.
+Admin API for OIXA Protocol.
 Endpoints for emergency controls, Safe setup, and system management.
 Protected by PROTOCOL_PRIVATE_KEY presence (server-side only — not a public API).
 """
@@ -35,7 +35,7 @@ def _require_admin(x_admin_key: str | None):
 
 @router.post("/admin/pause")
 async def emergency_pause(x_admin_key: str | None = Header(default=None)):
-    """Pause the VELUNEscrow contract on-chain."""
+    """Pause the OIXAEscrow contract on-chain."""
     _require_admin(x_admin_key)
 
     result = {"action": "pause", "blockchain": None, "timestamp": _now()}
@@ -54,7 +54,7 @@ async def emergency_pause(x_admin_key: str | None = Header(default=None)):
 
 @router.post("/admin/unpause")
 async def emergency_unpause(x_admin_key: str | None = Header(default=None)):
-    """Unpause the VELUNEscrow contract on-chain."""
+    """Unpause the OIXAEscrow contract on-chain."""
     _require_admin(x_admin_key)
 
     result = {"action": "unpause", "blockchain": None, "timestamp": _now()}

@@ -17,7 +17,7 @@ from datetime import datetime, timezone, timedelta
 from database import get_db
 from config import DISPUTE_WINDOW_MINUTES
 
-logger = logging.getLogger("velun.verifier")
+logger = logging.getLogger("oixa.verifier")
 
 
 async def verify_output(auction_id: str, output: str, agent_id: str) -> dict:
@@ -94,7 +94,7 @@ async def verify_output(auction_id: str, output: str, agent_id: str) -> dict:
         logger.warning(f"Verification failed | auction={auction_id} | reason={fail_reason}")
 
     # ── Save verification record (include full output text for arbiter) ───────
-    verify_id = f"velun_verify_{uuid.uuid4().hex[:12]}"
+    verify_id = f"oixa_verify_{uuid.uuid4().hex[:12]}"
     await db.execute(
         """INSERT INTO verifications (id, auction_id, output_hash, verified_at, passed, details)
            VALUES (?, ?, ?, ?, ?, ?)""",

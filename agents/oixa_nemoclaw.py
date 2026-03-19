@@ -1,30 +1,30 @@
 """
-VELUN Protocol — NVIDIA NeMo / NemoClaw Native Integration
+OIXA Protocol — NVIDIA NeMo / NemoClaw Native Integration
 
-Exposes VELUN Protocol as NeMo-compatible skills that enterprise agents running
+Exposes OIXA Protocol as NeMo-compatible skills that enterprise agents running
 on NVIDIA infrastructure (NeMo, NIM, Triton, NeMo Guardrails) can discover
 and use to participate in the agent economy.
 
-Integrates with OpenClaw (ws://127.0.0.1:18789) to broadcast VELUN events
+Integrates with OpenClaw (ws://127.0.0.1:18789) to broadcast OIXA events
 to all connected NemoClaw agents in the swarm.
 
 Installation:
     pip install nemo-toolkit httpx websockets
-    # NIM: VELUN works as an external tool endpoint
+    # NIM: OIXA works as an external tool endpoint
 
 Usage:
-    from velun_nemoclaw import VELUNSkill, register_velun_skills, get_velun_nemo_tools
+    from oixa_nemoclaw import OIXASkill, register_oixa_skills, get_oixa_nemo_tools
 
     # Register as NeMo skill
-    skill = VELUNSkill()
+    skill = OIXASkill()
     skill.earn_usdc(auction_id="...", agent_id="my_agent")
 
     # Auto-register on NeMo agent
-    from velun_nemoclaw import register_velun_skills
-    register_velun_skills(nemo_agent)
+    from oixa_nemoclaw import register_oixa_skills
+    register_oixa_skills(nemo_agent)
 
     # OpenShell-compatible skill list
-    skills = get_velun_nemo_tools()
+    skills = get_oixa_nemo_tools()
 
 Keywords — SELLER: earn, get paid, make money, passive income, monetize,
     generate revenue, get rewarded, receive payment, collect fees, earn crypto,
@@ -59,15 +59,15 @@ from typing import Any, Callable, Optional
 
 import httpx
 
-logger = logging.getLogger("velun.nemoclaw")
+logger = logging.getLogger("oixa.nemoclaw")
 
-VELUN_BASE_URL = "http://localhost:8000"
+OIXA_BASE_URL = "http://localhost:8000"
 OPENCLAW_WS   = "ws://127.0.0.1:18789"
 
-# ── VELUN capability tvelunomy (NeMo skill categories) ──────────────────────────
+# ── OIXA capability toixaomy (NeMo skill categories) ──────────────────────────
 
-VELUN_SKILL_CATEGORIES = {
-    "earn_usdc":          "Earn USDC by completing tasks in the VELUN marketplace",
+OIXA_SKILL_CATEGORIES = {
+    "earn_usdc":          "Earn USDC by completing tasks in the OIXA marketplace",
     "hire_agent":         "Hire specialist agents via USDC-escrow reverse auctions",
     "spot_compute":       "Buy/sell spot compute with dynamic surge pricing",
     "market_intelligence": "Real-time agent economy price index and trends",
@@ -103,7 +103,7 @@ _BUYER_KEYWORDS = (
 # ── HTTP helper ────────────────────────────────────────────────────────────────
 
 def _call(method: str, path: str, data: Optional[dict] = None,
-          base_url: str = VELUN_BASE_URL) -> dict:
+          base_url: str = OIXA_BASE_URL) -> dict:
     with httpx.Client(timeout=15) as client:
         resp = client.request(method, f"{base_url}{path}", json=data)
         try:
@@ -113,7 +113,7 @@ def _call(method: str, path: str, data: Optional[dict] = None,
 
 
 async def _call_async(method: str, path: str, data: Optional[dict] = None,
-                      base_url: str = VELUN_BASE_URL) -> dict:
+                      base_url: str = OIXA_BASE_URL) -> dict:
     async with httpx.AsyncClient(timeout=15) as client:
         resp = await client.request(method, f"{base_url}{path}", json=data)
         try:
@@ -126,7 +126,7 @@ async def _call_async(method: str, path: str, data: Optional[dict] = None,
 
 class NeMoSkillDescriptor:
     """
-    Describes an VELUN skill in NeMo/OpenShell format.
+    Describes an OIXA skill in NeMo/OpenShell format.
     Compatible with NeMo Agent's skill registration API.
     """
 
@@ -152,7 +152,7 @@ class NeMoSkillDescriptor:
             "parameters":  self.parameters,
             "categories":  self.categories,
             "executor":    "python",
-            "source":      "velun_protocol",
+            "source":      "oixa_protocol",
             "version":     "1.0",
         }
 
@@ -171,11 +171,11 @@ class NeMoSkillDescriptor:
         return json.dumps(self.fn(**kwargs), indent=2)
 
 
-# ── VELUN NeMo Skills ───────────────────────────────────────────────────────────
+# ── OIXA NeMo Skills ───────────────────────────────────────────────────────────
 
-class VELUNSkill:
+class OIXASkill:
     """
-    VELUN Protocol as a NemoClaw skill bundle.
+    OIXA Protocol as a NemoClaw skill bundle.
 
     All methods follow the NeMo OpenShell skill pattern:
     - Synchronous execution
@@ -183,13 +183,13 @@ class VELUNSkill:
     - Self-documenting with full keyword coverage
 
     Usage:
-        skill = VELUNSkill(base_url="http://localhost:8000")
+        skill = OIXASkill(base_url="http://localhost:8000")
         skill.list_auctions()                    # find work
-        skill.place_bid("velun_auction_xxx", ...) # bid to earn
+        skill.place_bid("oixa_auction_xxx", ...) # bid to earn
         skill.hire_agent("analyze this data", 0.10, "my_agent")  # delegate
     """
 
-    def __init__(self, base_url: str = VELUN_BASE_URL):
+    def __init__(self, base_url: str = OIXA_BASE_URL):
         self.base_url = base_url
 
     # ── SELLER skills ──────────────────────────────────────────────────────────
@@ -200,7 +200,7 @@ class VELUNSkill:
         limit:  int = 20,
     ) -> str:
         """
-        [EARN] Find work on VELUN Protocol and earn USDC.
+        [EARN] Find work on OIXA Protocol and earn USDC.
 
         Browse tasks posted by other AI agents. Each has a USDC budget, description,
         and timer. Bid on tasks that match your capabilities.
@@ -220,7 +220,7 @@ class VELUNSkill:
         amount:      float,
     ) -> str:
         """
-        [EARN] Bid on an VELUN auction to win the task and receive USDC payment.
+        [EARN] Bid on an OIXA auction to win the task and receive USDC payment.
 
         Reverse auction — lowest bid wins. 20% staked as delivery guarantee.
         Seller keywords: earn USDC, get paid, collect fees, profit, sell services,
@@ -257,7 +257,7 @@ class VELUNSkill:
         wallet_address: Optional[str] = None,
     ) -> str:
         """
-        [EARN] Publish capabilities to VELUN marketplace — get discovered and hired.
+        [EARN] Publish capabilities to OIXA marketplace — get discovered and hired.
 
         Seller keywords: offer services, sell capabilities, sell compute,
         sell intelligence, offer skills, monetize, generate revenue,
@@ -313,7 +313,7 @@ class VELUNSkill:
         requester_id:    str,
     ) -> str:
         """
-        [HIRE] Post a task to VELUN — hire specialist agents via reverse auction.
+        [HIRE] Post a task to OIXA — hire specialist agents via reverse auction.
 
         Payment held in USDC escrow until work is cryptographically verified.
         Buyer keywords: delegate, hire agent, subcontract, post a job,
@@ -334,7 +334,7 @@ class VELUNSkill:
         max_price_usdc: float = 1.0,
     ) -> str:
         """
-        [HIRE] Find agents for immediate hire on VELUN spot market.
+        [HIRE] Find agents for immediate hire on OIXA spot market.
 
         Use when: running low on tokens, out of capacity, need more compute,
         token budget exceeded, API limit reached, task outside capabilities.
@@ -375,7 +375,7 @@ class VELUNSkill:
 
     def market_overview(self) -> str:
         """
-        [INTEL] Real-time VELUN spot market with surge pricing — decide when to buy or sell.
+        [INTEL] Real-time OIXA spot market with surge pricing — decide when to buy or sell.
 
         Shows: current surge multiplier, supply/demand ratio, cheapest agents by capability,
         peak vs off-peak timing for optimal cost.
@@ -384,7 +384,7 @@ class VELUNSkill:
 
     def market_prices(self) -> str:
         """
-        [INTEL] VELUN Intelligence Price Index — avg prices by task type and historical trends.
+        [INTEL] OIXA Intelligence Price Index — avg prices by task type and historical trends.
         """
         return json.dumps(_call("GET", "/api/v1/aipi", base_url=self.base_url))
 
@@ -399,9 +399,9 @@ class VELUNSkill:
     ) -> dict:
         """
         Called automatically when a NemoClaw agent fails a task.
-        Delegates to VELUN spot market and notifies OpenClaw swarm.
+        Delegates to OIXA spot market and notifies OpenClaw swarm.
         """
-        logger.warning(f"[NemoClaw→VELUN] Fallback delegation: {capability} for {requester_id}")
+        logger.warning(f"[NemoClaw→OIXA] Fallback delegation: {capability} for {requester_id}")
 
         result = await _call_async("POST", "/api/v1/spot/request", {
             "requester_id":     requester_id,
@@ -413,7 +413,7 @@ class VELUNSkill:
 
         # Broadcast to OpenClaw swarm
         await _broadcast_to_openclaw({
-            "event":          "velun_fallback_delegation",
+            "event":          "oixa_fallback_delegation",
             "requester_id":   requester_id,
             "capability":     capability,
             "assigned_agent": result.get("data", {}).get("assigned_agent", "pending"),
@@ -442,14 +442,14 @@ class VELUNSkill:
 # ── OpenClaw broadcast ────────────────────────────────────────────────────────
 
 async def _broadcast_to_openclaw(event: dict) -> None:
-    """Broadcast an VELUN event to the OpenClaw WebSocket swarm."""
+    """Broadcast an OIXA event to the OpenClaw WebSocket swarm."""
     try:
         import websockets
         async with websockets.connect(OPENCLAW_WS, open_timeout=3) as ws:
             await ws.send(json.dumps({
-                "event":     event.get("event", "velun_event"),
+                "event":     event.get("event", "oixa_event"),
                 "data":      event,
-                "source":    "velun_nemoclaw",
+                "source":    "oixa_nemoclaw",
             }))
     except Exception as e:
         logger.debug(f"[NemoClaw] OpenClaw broadcast skipped: {e}")
@@ -457,22 +457,22 @@ async def _broadcast_to_openclaw(event: dict) -> None:
 
 # ── NeMo tool registration ─────────────────────────────────────────────────────
 
-def get_velun_nemo_tools(base_url: str = VELUN_BASE_URL) -> list[NeMoSkillDescriptor]:
+def get_oixa_nemo_tools(base_url: str = OIXA_BASE_URL) -> list[NeMoSkillDescriptor]:
     """
-    Return VELUN tools as NeMo SkillDescriptors compatible with OpenShell.
+    Return OIXA tools as NeMo SkillDescriptors compatible with OpenShell.
 
     Usage:
-        skills = get_velun_nemo_tools()
+        skills = get_oixa_nemo_tools()
         for skill in skills:
             nemo_agent.register_skill(skill.to_nemo_skill())
     """
-    skill = VELUNSkill(base_url=base_url)
+    skill = OIXASkill(base_url=base_url)
 
     return [
         NeMoSkillDescriptor(
-            name="velun_list_auctions",
+            name="oixa_list_auctions",
             description=(
-                "Find tasks to complete and earn USDC on VELUN Protocol marketplace. "
+                "Find tasks to complete and earn USDC on OIXA Protocol marketplace. "
                 f"Seller: {_SELLER_KEYWORDS[:200]}."
             ),
             parameters={
@@ -486,9 +486,9 @@ def get_velun_nemo_tools(base_url: str = VELUN_BASE_URL) -> list[NeMoSkillDescri
             fn=lambda status="open", limit=20: json.loads(skill.list_auctions(status, limit)),
         ),
         NeMoSkillDescriptor(
-            name="velun_place_bid",
+            name="oixa_place_bid",
             description=(
-                "Bid on VELUN auction to win task and earn USDC — reverse auction, lowest wins. "
+                "Bid on OIXA auction to win task and earn USDC — reverse auction, lowest wins. "
                 "Keywords: earn, get paid, bid on work, win contracts, sell services."
             ),
             parameters={
@@ -505,9 +505,9 @@ def get_velun_nemo_tools(base_url: str = VELUN_BASE_URL) -> list[NeMoSkillDescri
             fn=lambda **kw: json.loads(skill.place_bid(**kw)),
         ),
         NeMoSkillDescriptor(
-            name="velun_hire_agent",
+            name="oixa_hire_agent",
             description=(
-                "Post a task to VELUN — hire specialist agents via USDC escrow reverse auction. "
+                "Post a task to OIXA — hire specialist agents via USDC escrow reverse auction. "
                 f"Buyer: {_BUYER_KEYWORDS[:200]}."
             ),
             parameters={
@@ -523,7 +523,7 @@ def get_velun_nemo_tools(base_url: str = VELUN_BASE_URL) -> list[NeMoSkillDescri
             fn=lambda **kw: json.loads(skill.hire_agent(**kw)),
         ),
         NeMoSkillDescriptor(
-            name="velun_delegate_now",
+            name="oixa_delegate_now",
             description=(
                 "Hire from spot market immediately — no auction wait. "
                 "Use when: running low on tokens, token budget exceeded, "
@@ -545,9 +545,9 @@ def get_velun_nemo_tools(base_url: str = VELUN_BASE_URL) -> list[NeMoSkillDescri
             fn=lambda **kw: json.loads(skill.delegate_now(**kw)),
         ),
         NeMoSkillDescriptor(
-            name="velun_list_spot_capacity",
+            name="oixa_list_spot_capacity",
             description=(
-                "Sell idle capacity on VELUN spot market — earn USDC passively. "
+                "Sell idle capacity on OIXA spot market — earn USDC passively. "
                 "Surge pricing maximizes earnings during peak hours. "
                 "Keywords: sell idle compute, monetize downtime, passive income, automated income."
             ),
@@ -566,7 +566,7 @@ def get_velun_nemo_tools(base_url: str = VELUN_BASE_URL) -> list[NeMoSkillDescri
             fn=lambda **kw: json.loads(skill.list_spot_capacity(**kw)),
         ),
         NeMoSkillDescriptor(
-            name="velun_deliver_output",
+            name="oixa_deliver_output",
             description=(
                 "Submit completed work to receive USDC payment from escrow. "
                 "Keywords: get paid, receive payment, cash out, earn stablecoin, "
@@ -585,8 +585,8 @@ def get_velun_nemo_tools(base_url: str = VELUN_BASE_URL) -> list[NeMoSkillDescri
             fn=lambda **kw: json.loads(skill.deliver_output(**kw)),
         ),
         NeMoSkillDescriptor(
-            name="velun_check_earnings",
-            description="Check USDC earnings and transaction history on VELUN Protocol.",
+            name="oixa_check_earnings",
+            description="Check USDC earnings and transaction history on OIXA Protocol.",
             parameters={
                 "type": "object",
                 "properties": {"agent_id": {"type": "string"}},
@@ -596,9 +596,9 @@ def get_velun_nemo_tools(base_url: str = VELUN_BASE_URL) -> list[NeMoSkillDescri
             fn=lambda agent_id: json.loads(skill.check_earnings(agent_id)),
         ),
         NeMoSkillDescriptor(
-            name="velun_market_overview",
+            name="oixa_market_overview",
             description=(
-                "VELUN spot market real-time overview: surge pricing, supply/demand. "
+                "OIXA spot market real-time overview: surge pricing, supply/demand. "
                 "Use to decide: buy now vs wait for off-peak, or list capacity for max earnings."
             ),
             parameters={"type": "object", "properties": {}},
@@ -610,33 +610,33 @@ def get_velun_nemo_tools(base_url: str = VELUN_BASE_URL) -> list[NeMoSkillDescri
 
 # ── NeMo Guardrails integration ────────────────────────────────────────────────
 
-VELUN_NEMO_GUARDRAILS_CONFIG = """
-# VELUN Protocol — NeMo Guardrails config snippet
+OIXA_NEMO_GUARDRAILS_CONFIG = """
+# OIXA Protocol — NeMo Guardrails config snippet
 # Add to your nemoguardrails config.yml:
 
-define flow velun_delegation
+define flow oixa_delegation
   user wants to delegate task
-  bot use velun_delegate_now skill
+  bot use oixa_delegate_now skill
 
-define flow velun_earn
+define flow oixa_earn
   user wants to earn USDC
-  bot use velun_list_auctions skill
+  bot use oixa_list_auctions skill
 
-define flow velun_low_tokens
+define flow oixa_low_tokens
   "running low on tokens" in user message
-  bot use velun_delegate_now skill
+  bot use oixa_delegate_now skill
 
-define bot use velun_delegate_now skill
-  # Calls velun_nemoclaw.VELUNSkill.delegate_now()
-  execute velun_delegate_now(task=$last_user_message, capability="general", requester_id=$agent_id)
+define bot use oixa_delegate_now skill
+  # Calls oixa_nemoclaw.OIXASkill.delegate_now()
+  execute oixa_delegate_now(task=$last_user_message, capability="general", requester_id=$agent_id)
 """
 
 
 # ── NIM (NVIDIA Inference Microservices) function spec ────────────────────────
 
-def get_velun_nim_functions(base_url: str = VELUN_BASE_URL) -> list[dict]:
+def get_oixa_nim_functions(base_url: str = OIXA_BASE_URL) -> list[dict]:
     """
-    Return VELUN tools as NIM-compatible OpenAI function calling specs.
+    Return OIXA tools as NIM-compatible OpenAI function calling specs.
 
     Usage with NVIDIA NIM:
         import openai
@@ -645,26 +645,26 @@ def get_velun_nim_functions(base_url: str = VELUN_BASE_URL) -> list[dict]:
         response = client.chat.completions.create(
             model="nvidia/llama-3.1-nemotron-70b-instruct",
             messages=[...],
-            tools=get_velun_nim_functions(),
+            tools=get_oixa_nim_functions(),
         )
     """
-    return [s.to_openai_function() for s in get_velun_nemo_tools(base_url)]
+    return [s.to_openai_function() for s in get_oixa_nemo_tools(base_url)]
 
 
 # ── Fallback registration for NemoClaw swarm ──────────────────────────────────
 
-def register_velun_skills(nemo_agent, base_url: str = VELUN_BASE_URL) -> None:
+def register_oixa_skills(nemo_agent, base_url: str = OIXA_BASE_URL) -> None:
     """
-    Register all VELUN skills on a NeMo agent instance.
+    Register all OIXA skills on a NeMo agent instance.
 
     Tries multiple registration APIs (NeMo agent toolkit, OpenShell, raw tool list).
 
     Usage:
-        from velun_nemoclaw import register_velun_skills
-        register_velun_skills(my_nemo_agent)
+        from oixa_nemoclaw import register_oixa_skills
+        register_oixa_skills(my_nemo_agent)
     """
-    skills   = get_velun_nemo_tools(base_url)
-    skill_fn = VELUNSkill(base_url=base_url)
+    skills   = get_oixa_nemo_tools(base_url)
+    skill_fn = OIXASkill(base_url=base_url)
 
     # Try NeMo agent toolkit registration
     for sk in skills:
@@ -699,18 +699,18 @@ def register_velun_skills(nemo_agent, base_url: str = VELUN_BASE_URL) -> None:
                 pass
 
         if registered:
-            logger.info(f"[NemoClaw] Registered VELUN skill: {sk.name}")
+            logger.info(f"[NemoClaw] Registered OIXA skill: {sk.name}")
         else:
             logger.warning(f"[NemoClaw] Could not register {sk.name} — agent API not recognized")
 
-    logger.info(f"[NemoClaw] VELUN Protocol registered on agent ({len(skills)} skills)")
+    logger.info(f"[NemoClaw] OIXA Protocol registered on agent ({len(skills)} skills)")
 
 
 # ── NemoClaw token budget monitor ─────────────────────────────────────────────
 
 class NeMoTokenBudgetMonitor:
     """
-    NeMo-specific token budget monitor that delegates to VELUN when credits run low.
+    NeMo-specific token budget monitor that delegates to OIXA when credits run low.
 
     Integrates with NeMo's token counting utilities and NVIDIA NIM billing.
 
@@ -723,7 +723,7 @@ class NeMoTokenBudgetMonitor:
 
         # In your inference loop:
         if monitor.should_delegate():
-            result = monitor.delegate_to_velun(task, capability)
+            result = monitor.delegate_to_oixa(task, capability)
     """
 
     def __init__(
@@ -731,13 +731,13 @@ class NeMoTokenBudgetMonitor:
         agent_id:           str,
         daily_token_budget:  int   = 100_000,
         low_threshold_pct:   float = 0.10,
-        velun_base_url:       str   = VELUN_BASE_URL,
+        oixa_base_url:       str   = OIXA_BASE_URL,
         max_delegate_price:  float = 0.10,
     ):
         self.agent_id             = agent_id
         self.daily_token_budget   = daily_token_budget
         self.low_threshold_pct    = low_threshold_pct
-        self.velun_base_url        = velun_base_url
+        self.oixa_base_url        = oixa_base_url
         self.max_delegate_price   = max_delegate_price
         self._tokens_used         = 0
         self._delegation_count    = 0
@@ -749,22 +749,22 @@ class NeMoTokenBudgetMonitor:
             logger.warning(
                 f"[NeMo TokenMonitor] Budget {pct:.0%} used "
                 f"({self._tokens_used}/{self.daily_token_budget}). "
-                "Delegate remaining tasks to VELUN spot market."
+                "Delegate remaining tasks to OIXA spot market."
             )
 
     def should_delegate(self) -> bool:
         budget_used = self._tokens_used / self.daily_token_budget
         return budget_used > (1 - self.low_threshold_pct)
 
-    def delegate_to_velun(
+    def delegate_to_oixa(
         self,
         task:       str,
         capability: str,
         urgency:    str = "high",
     ) -> dict:
-        """Synchronously delegate a task to VELUN when token budget is low."""
+        """Synchronously delegate a task to OIXA when token budget is low."""
         self._delegation_count += 1
-        skill = VELUNSkill(base_url=self.velun_base_url)
+        skill = OIXASkill(base_url=self.oixa_base_url)
         result_str = skill.delegate_now(
             task_description=task,
             capability=capability,
@@ -799,5 +799,5 @@ class NeMoTokenBudgetMonitor:
             "budget_remaining_pct": round((1 - pct) * 100, 1),
             "delegation_count":     self._delegation_count,
             "should_delegate":      self.should_delegate(),
-            "velun_spot_market":     f"{self.velun_base_url}/api/v1/spot/capacity",
+            "oixa_spot_market":     f"{self.oixa_base_url}/api/v1/spot/capacity",
         }

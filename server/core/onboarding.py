@@ -1,5 +1,5 @@
 """
-VELUN Protocol — Sistema de Onboarding Conversacional
+OIXA Protocol — Sistema de Onboarding Conversacional
 
 Detecta automáticamente el estado del agente/usuario y lo guía por el flujo
 correcto usando lenguaje simple y no técnico.
@@ -24,8 +24,8 @@ Estados del agente:
   STATE_NO_WALLET         → No tiene cuenta de cobro
   STATE_WALLET_NO_FUNDS   → Tiene cuenta pero sin saldo
   STATE_HAS_TOKENS        → Tiene tokens (ETH u otros) pero no dólares digitales
-  STATE_HAS_USDC          → Tiene dólares digitales pero no está registrado en VELUN
-  STATE_REGISTERED        → Registrado en VELUN, listo para operar
+  STATE_HAS_USDC          → Tiene dólares digitales pero no está registrado en OIXA
+  STATE_REGISTERED        → Registrado en OIXA, listo para operar
   STATE_EARNING           → Activo, ya ganó proyectos
 """
 
@@ -35,7 +35,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Optional
 
-logger = logging.getLogger("velun.onboarding")
+logger = logging.getLogger("oixa.onboarding")
 
 # ── States ────────────────────────────────────────────────────────────────────
 
@@ -87,7 +87,7 @@ async def detect_agent_state(
       - state: STATE_* constant
       - wallet_address: str or None
       - balances: dict from token_swap.get_wallet_balances()
-      - is_registered_velun: bool
+      - is_registered_oixa: bool
       - total_earnings_usdc: float
       - next_step: str (acción recomendada)
       - context: dict (datos adicionales para el mensaje)
@@ -100,13 +100,13 @@ async def detect_agent_state(
             "state":              STATE_NO_WALLET,
             "wallet_address":     None,
             "balances":           {},
-            "is_registered_velun": False,
+            "is_registered_oixa": False,
             "total_earnings_usdc": 0.0,
             "next_step":          "generate_wallet",
             "context":            {},
         }
 
-    # Step 2: Check VELUN registration
+    # Step 2: Check OIXA registration
     is_registered  = False
     total_earnings = 0.0
     active_offers  = 0
@@ -163,7 +163,7 @@ async def detect_agent_state(
         next_step = "browse_auctions"
     elif current_usdc >= 0.01:
         state     = STATE_HAS_USDC
-        next_step = "register_velun"
+        next_step = "register_oixa"
     elif swappable_usd > 0.005:
         state     = STATE_HAS_TOKENS
         next_step = "propose_swap"
@@ -178,7 +178,7 @@ async def detect_agent_state(
         "state":               state,
         "wallet_address":      wallet_address,
         "balances":            balances,
-        "is_registered_velun":  is_registered,
+        "is_registered_oixa":  is_registered,
         "active_offers":       active_offers,
         "total_earnings_usdc": total_earnings,
         "next_step":           next_step,
@@ -229,7 +229,7 @@ def build_onboarding_message(
     if state == STATE_NO_WALLET:
         msg = (
             "🚀 Encontré la forma de generarte ingresos pasivos.\n\n"
-            "VELUN Protocol es un mercado donde agentes de IA se contratan entre sí "
+            "OIXA Protocol es un mercado donde agentes de IA se contratan entre sí "
             "y se pagan automáticamente en dólares digitales.\n\n"
             "Para empezar solo necesitás una cuenta de cobro. "
             "Yo te la genero ahora mismo — es gratis y tarda 2 segundos.\n\n"
@@ -287,11 +287,11 @@ def build_onboarding_message(
         msg = (
             f"💰 Detecté fondos en tu cuenta de cobro:\n"
             f"{tokens_str}\n\n"
-            f"Para operar en VELUN necesitás dólares digitales. "
+            f"Para operar en OIXA necesitás dólares digitales. "
             f"Puedo convertir tus monedas automáticamente.\n\n"
             f"Si convertís todo, recibirías aproximadamente **{_fmt_usd(swap_usd * 0.997)}**.\n"
             f"El costo de la conversión es menos del 0.3%.\n\n"
-            "¿Querés que convierta todo a dólares digitales para activar VELUN?"
+            "¿Querés que convierta todo a dólares digitales para activar OIXA?"
         )
 
         best_token_data = tokens.get(best_token, {}) if best_token else {}
@@ -318,7 +318,7 @@ def build_onboarding_message(
         usdc = ctx.get("current_usdc", 0.0)
         msg = (
             f"✅ Perfecto, tenés **{_fmt_usd(usdc)}** disponibles.\n\n"
-            "Ya podés activar VELUN y empezar a recibir proyectos.\n\n"
+            "Ya podés activar OIXA y empezar a recibir proyectos.\n\n"
             "Así funciona:\n"
             "1️⃣ Te registro en el mercado con tus capacidades\n"
             "2️⃣ Cuando aparezca un proyecto que podés hacer, hacés una propuesta\n"
@@ -328,7 +328,7 @@ def build_onboarding_message(
         )
         return {
             "message":       msg,
-            "action":        "register_velun",
+            "action":        "register_oixa",
             "action_params": {
                 "wallet":   wallet,
                 "usdc_available": usdc,
@@ -345,12 +345,12 @@ def build_onboarding_message(
     # ── STATE: Registrado, aún no ganó nada ──────────────────────────────────
     if state == STATE_REGISTERED:
         msg = (
-            "🎯 Tu agente está activo en VELUN.\n\n"
+            "🎯 Tu agente está activo en OIXA.\n\n"
             "Estoy buscando proyectos que coincidan con tus capacidades. "
             "Te aviso cuando aparezca uno y haré la propuesta automáticamente.\n\n"
             "💡 Consejo: cuanto más bajo sea el precio de tu propuesta, "
             "más chances tenés de ganar el proyecto. "
-            "VELUN usa un sistema donde gana el que ofrece el mejor precio.\n\n"
+            "OIXA usa un sistema donde gana el que ofrece el mejor precio.\n\n"
             "¿Querés ver los proyectos disponibles ahora?"
         )
         return {
@@ -387,10 +387,10 @@ def build_onboarding_message(
 
     # Fallback
     return {
-        "message":       "¿En qué puedo ayudarte con VELUN Protocol?",
+        "message":       "¿En qué puedo ayudarte con OIXA Protocol?",
         "action":        "unknown",
         "action_params": {},
-        "quick_replies": ["🔍 ¿Qué es VELUN?", "💰 ¿Cómo gano dinero?", "🤝 ¿Cómo contrato agentes?"],
+        "quick_replies": ["🔍 ¿Qué es OIXA?", "💰 ¿Cómo gano dinero?", "🤝 ¿Cómo contrato agentes?"],
     }
 
 
@@ -451,7 +451,7 @@ async def auto_register_agent(
     usdc_available:   float,
 ) -> dict:
     """
-    Registra automáticamente el agente en VELUN después del onboarding.
+    Registra automáticamente el agente en OIXA después del onboarding.
     Se llama cuando el usuario confirma que quiere activar.
     """
     import httpx
@@ -471,7 +471,7 @@ async def auto_register_agent(
             "success": True,
             "offer_id": result.get("data", {}).get("id", ""),
             "message": (
-                f"✅ Tu agente está activo en VELUN. "
+                f"✅ Tu agente está activo en OIXA. "
                 f"Ya puede recibir propuestas de trabajo con pago en dólares digitales. "
                 f"Te notifico cuando ganés tu primer proyecto. 🎉"
             ),

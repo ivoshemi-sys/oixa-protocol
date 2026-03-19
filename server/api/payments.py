@@ -1,5 +1,5 @@
 """
-Stripe payments API for VELUN Protocol.
+Stripe payments API for OIXA Protocol.
 
 Endpoints:
   Crypto Onramp:
@@ -64,7 +64,7 @@ def _require_stripe():
 class OnrampSessionCreate(BaseModel):
     amount_usd: float                  # USD amount user wants to spend
     wallet_address: str                # destination USDC wallet on Base
-    auction_id: Optional[str] = None  # optional: link to a specific VELUN auction
+    auction_id: Optional[str] = None  # optional: link to a specific OIXA auction
     agent_id:   Optional[str] = None
 
 
@@ -116,7 +116,7 @@ async def create_onramp_session(body: OnrampSessionCreate, request: Request):
         return _err(str(e), "STRIPE_ERROR")
 
     # Persist session record
-    session_id = f"velun_session_{uuid.uuid4().hex[:12]}"
+    session_id = f"oixa_session_{uuid.uuid4().hex[:12]}"
     db = await get_db()
     await db.execute(
         """INSERT INTO stripe_onramp_sessions
@@ -268,7 +268,7 @@ async def onramp_webhook(request: Request, stripe_signature: str = Header(None))
 @router.post("/payments/issuing/cardholders")
 async def create_cardholder(body: CardholderCreate):
     """
-    Register an VELUN agent as a Stripe Issuing cardholder.
+    Register an OIXA agent as a Stripe Issuing cardholder.
     Required before issuing virtual cards to the agent.
     """
     _require_stripe()
@@ -302,7 +302,7 @@ async def create_cardholder(body: CardholderCreate):
         logger.error(f"Stripe cardholder creation failed: {e}")
         return _err(str(e), "STRIPE_ERROR")
 
-    cardholder_id = f"velun_ch_{uuid.uuid4().hex[:12]}"
+    cardholder_id = f"oixa_ch_{uuid.uuid4().hex[:12]}"
     await db.execute(
         """INSERT INTO stripe_cardholders
            (id, stripe_cardholder_id, agent_id, agent_name, email, status, created_at)
@@ -353,7 +353,7 @@ async def get_cardholder(agent_id: str):
 @router.post("/payments/issuing/cards")
 async def issue_card(body: CardCreate):
     """
-    Issue a virtual Visa card to a registered VELUN agent.
+    Issue a virtual Visa card to a registered OIXA agent.
     The agent must have a cardholder record first (POST /issuing/cardholders).
     The card can be used to pay for fiat services anywhere Visa is accepted.
     """
@@ -384,7 +384,7 @@ async def issue_card(body: CardCreate):
         logger.error(f"Stripe card creation failed: {e}")
         return _err(str(e), "STRIPE_ERROR")
 
-    card_id = f"velun_card_{uuid.uuid4().hex[:12]}"
+    card_id = f"oixa_card_{uuid.uuid4().hex[:12]}"
     await db.execute(
         """INSERT INTO stripe_cards
            (id, stripe_card_id, cardholder_id, agent_id, last4,

@@ -15,7 +15,7 @@ For PostgreSQL, a thin adapter translates to asyncpg.
 import logging
 from config import DB_PATH, DATABASE_URL, USE_POSTGRES
 
-logger = logging.getLogger("velun.db")
+logger = logging.getLogger("oixa.db")
 
 # ---------------------------------------------------------------------------
 # SQLite backend (default / fallback) — raw aiosqlite connection
@@ -325,7 +325,7 @@ CREATE TABLE IF NOT EXISTS daily_spending (
 );
 
 CREATE TABLE IF NOT EXISTS stripe_onramp_sessions (
-    id TEXT PRIMARY KEY,               -- velun_session_xxx
+    id TEXT PRIMARY KEY,               -- oixa_session_xxx
     stripe_session_id TEXT UNIQUE,     -- cos_xxx from Stripe
     client_secret TEXT,
     wallet_address TEXT NOT NULL,
@@ -338,7 +338,7 @@ CREATE TABLE IF NOT EXISTS stripe_onramp_sessions (
 );
 
 CREATE TABLE IF NOT EXISTS stripe_cardholders (
-    id TEXT PRIMARY KEY,               -- velun_ch_xxx
+    id TEXT PRIMARY KEY,               -- oixa_ch_xxx
     stripe_cardholder_id TEXT UNIQUE,  -- ich_xxx from Stripe
     agent_id TEXT NOT NULL,
     agent_name TEXT NOT NULL,
@@ -348,9 +348,9 @@ CREATE TABLE IF NOT EXISTS stripe_cardholders (
 );
 
 CREATE TABLE IF NOT EXISTS stripe_cards (
-    id TEXT PRIMARY KEY,               -- velun_card_xxx
+    id TEXT PRIMARY KEY,               -- oixa_card_xxx
     stripe_card_id TEXT UNIQUE,        -- ic_xxx from Stripe
-    cardholder_id TEXT NOT NULL,       -- velun_ch_xxx
+    cardholder_id TEXT NOT NULL,       -- oixa_ch_xxx
     agent_id TEXT NOT NULL,
     last4 TEXT,
     exp_month INTEGER,
@@ -361,7 +361,7 @@ CREATE TABLE IF NOT EXISTS stripe_cards (
 );
 
 CREATE TABLE IF NOT EXISTS cctp_transfers (
-    id TEXT PRIMARY KEY,               -- velun_cctp_xxx
+    id TEXT PRIMARY KEY,               -- oixa_cctp_xxx
     source_chain TEXT NOT NULL,        -- ethereum, arbitrum, avalanche, polygon, solana
     source_tx_hash TEXT,               -- burn tx on source chain
     message_hash TEXT UNIQUE,          -- keccak256 of message bytes
@@ -378,7 +378,7 @@ CREATE TABLE IF NOT EXISTS cctp_transfers (
 );
 
 CREATE TABLE IF NOT EXISTS coinbase_charges (
-    id TEXT PRIMARY KEY,               -- velun_cb_xxx
+    id TEXT PRIMARY KEY,               -- oixa_cb_xxx
     coinbase_charge_id TEXT UNIQUE,    -- Coinbase internal UUID
     charge_code TEXT UNIQUE,           -- short code (e.g. AXYZ1234)
     hosted_url TEXT,
@@ -393,7 +393,7 @@ CREATE TABLE IF NOT EXISTS coinbase_charges (
 );
 
 CREATE TABLE IF NOT EXISTS circle_payments (
-    id TEXT PRIMARY KEY,               -- velun_circle_xxx
+    id TEXT PRIMARY KEY,               -- oixa_circle_xxx
     circle_intent_id TEXT,             -- Circle payment intent ID
     circle_payment_id TEXT,            -- Circle incoming payment ID
     amount_usdc REAL NOT NULL,
@@ -407,7 +407,7 @@ CREATE TABLE IF NOT EXISTS circle_payments (
 );
 
 CREATE TABLE IF NOT EXISTS capacity_listings (
-    id TEXT PRIMARY KEY,               -- velun_spot_xxx
+    id TEXT PRIMARY KEY,               -- oixa_spot_xxx
     agent_id TEXT NOT NULL,
     agent_name TEXT NOT NULL,
     capabilities TEXT NOT NULL,        -- JSON array of capability strings
@@ -423,7 +423,7 @@ CREATE TABLE IF NOT EXISTS capacity_listings (
 );
 
 CREATE TABLE IF NOT EXISTS spot_requests (
-    id TEXT PRIMARY KEY,               -- velun_sreq_xxx
+    id TEXT PRIMARY KEY,               -- oixa_sreq_xxx
     requester_id TEXT NOT NULL,
     listing_id TEXT NOT NULL,
     agent_id TEXT NOT NULL,
@@ -449,7 +449,7 @@ CREATE TABLE IF NOT EXISTS a2a_tasks (
 );
 
 CREATE TABLE IF NOT EXISTS onboarding_sessions (
-    id TEXT PRIMARY KEY,               -- velun_ob_xxx
+    id TEXT PRIMARY KEY,               -- oixa_ob_xxx
     agent_id TEXT,
     wallet_address TEXT,
     state TEXT NOT NULL,               -- no_wallet, wallet_no_funds, has_tokens, has_usdc, registered, earning

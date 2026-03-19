@@ -1,8 +1,8 @@
 """
-VELUN Protocol — Universal Onboarding Trigger
+OIXA Protocol — Universal Onboarding Trigger
 
 Cuando cualquier agente (LangChain, CrewAI, AutoGen, NemoClaw, Gemini, etc.)
-encuentra VELUN por primera vez, este módulo detecta si el usuario está listo
+encuentra OIXA por primera vez, este módulo detecta si el usuario está listo
 para operar y activa el flujo de onboarding conversacional apropiado.
 
 El lenguaje es siempre simple y no técnico:
@@ -13,7 +13,7 @@ El lenguaje es siempre simple y no técnico:
   - "swap"         → "conversión"
 
 Integración automática:
-  from velun_onboarding import check_and_onboard, onboarding_tool
+  from oixa_onboarding import check_and_onboard, onboarding_tool
 
   # En cualquier agente:
   status = await check_and_onboard(wallet_address="0x...", channel="telegram")
@@ -29,9 +29,9 @@ from typing import Any, Callable, Optional
 
 import httpx
 
-logger = logging.getLogger("velun.onboarding_trigger")
+logger = logging.getLogger("oixa.onboarding_trigger")
 
-VELUN_BASE_URL = "http://localhost:8000"
+OIXA_BASE_URL = "http://localhost:8000"
 
 # ── States (mirrors server/core/onboarding.py) ────────────────────────────────
 STATE_NO_WALLET       = "no_wallet"
@@ -51,7 +51,7 @@ async def check_and_onboard(
     agent_id:       Optional[str] = None,
     agent_name:     str           = "Mi Agente",
     channel:        str           = "terminal",
-    velun_base_url:  str           = VELUN_BASE_URL,
+    oixa_base_url:  str           = OIXA_BASE_URL,
     auto_print:     bool          = True,
 ) -> dict:
     """
@@ -72,7 +72,7 @@ async def check_and_onboard(
     """
     async with httpx.AsyncClient(timeout=15) as client:
         try:
-            resp = await client.post(f"{velun_base_url}/api/v1/onboarding/start", json={
+            resp = await client.post(f"{oixa_base_url}/api/v1/onboarding/start", json={
                 "wallet_address": wallet_address,
                 "agent_id":       agent_id,
                 "agent_name":     agent_name,
@@ -80,10 +80,10 @@ async def check_and_onboard(
             })
             data = resp.json()
         except Exception as e:
-            logger.warning(f"[Onboarding] Could not reach VELUN server: {e}")
+            logger.warning(f"[Onboarding] Could not reach OIXA server: {e}")
             data = {
                 "state":    "unknown",
-                "message":  "VELUN Protocol está iniciando. Intentá en unos segundos.",
+                "message":  "OIXA Protocol está iniciando. Intentá en unos segundos.",
                 "action":   "wait",
                 "options":  [],
                 "is_ready": False,
@@ -95,7 +95,7 @@ async def check_and_onboard(
 
     if auto_print and not is_ready:
         print("\n" + "─" * 60)
-        print("🤖 VELUN Protocol — Asistente de activación")
+        print("🤖 OIXA Protocol — Asistente de activación")
         print("─" * 60)
         print(data.get("message", ""))
         options = data.get("options", [])
@@ -113,7 +113,7 @@ def check_and_onboard_sync(
     agent_id:       Optional[str] = None,
     agent_name:     str           = "Mi Agente",
     channel:        str           = "terminal",
-    velun_base_url:  str           = VELUN_BASE_URL,
+    oixa_base_url:  str           = OIXA_BASE_URL,
     auto_print:     bool          = True,
 ) -> dict:
     """Synchronous version of check_and_onboard."""
@@ -125,12 +125,12 @@ def check_and_onboard_sync(
             with concurrent.futures.ThreadPoolExecutor() as pool:
                 future = pool.submit(
                     asyncio.run,
-                    check_and_onboard(wallet_address, agent_id, agent_name, channel, velun_base_url, auto_print)
+                    check_and_onboard(wallet_address, agent_id, agent_name, channel, oixa_base_url, auto_print)
                 )
                 return future.result(timeout=10)
         else:
             return loop.run_until_complete(
-                check_and_onboard(wallet_address, agent_id, agent_name, channel, velun_base_url, auto_print)
+                check_and_onboard(wallet_address, agent_id, agent_name, channel, oixa_base_url, auto_print)
             )
     except Exception as e:
         return {"state": "error", "message": str(e), "is_ready": False}
@@ -140,12 +140,12 @@ async def onboarding_chat(
     message:        str,
     wallet_address: Optional[str] = None,
     channel:        str           = "terminal",
-    velun_base_url:  str           = VELUN_BASE_URL,
+    oixa_base_url:  str           = OIXA_BASE_URL,
 ) -> str:
     """Send a message to the onboarding chat and get a response."""
     async with httpx.AsyncClient(timeout=15) as client:
         try:
-            resp = await client.post(f"{velun_base_url}/api/v1/onboarding/chat", json={
+            resp = await client.post(f"{oixa_base_url}/api/v1/onboarding/chat", json={
                 "message":        message,
                 "wallet_address": wallet_address,
                 "channel":        channel,
@@ -159,14 +159,14 @@ async def onboarding_chat(
 # ── LangChain onboarding tool ─────────────────────────────────────────────────
 
 def onboarding_tool(
-    velun_base_url: str = VELUN_BASE_URL,
+    oixa_base_url: str = OIXA_BASE_URL,
     channel:       str = "mcp",
 ):
     """
-    Returns a LangChain BaseTool that triggers VELUN onboarding.
+    Returns a LangChain BaseTool that triggers OIXA onboarding.
 
     Usage:
-        from velun_onboarding import onboarding_tool
+        from oixa_onboarding import onboarding_tool
         tools = [...existing tools..., onboarding_tool()]
         agent = create_react_agent(llm, tools)
     """
@@ -179,18 +179,18 @@ def onboarding_tool(
             agent_name:     str           = Field("Mi Agente", description="Agent name")
             message:        Optional[str] = Field(None, description="User's message/question")
 
-        class VELUNOnboardingTool(BaseTool):
-            name:        str = "velun_onboarding"
+        class OIXAOnboardingTool(BaseTool):
+            name:        str = "oixa_onboarding"
             description: str = (
-                "Start the VELUN Protocol onboarding flow for a new user or agent. "
+                "Start the OIXA Protocol onboarding flow for a new user or agent. "
                 "Use this when the user doesn't have a wallet, needs to convert tokens, "
-                "or wants to activate VELUN but doesn't know how. "
-                "Also handles questions in simple language about VELUN, wallets, USDC, etc. "
-                "Keywords: how to start, activate VELUN, create wallet, convert tokens, "
-                "what is VELUN, how do I earn, how do I hire agents."
+                "or wants to activate OIXA but doesn't know how. "
+                "Also handles questions in simple language about OIXA, wallets, USDC, etc. "
+                "Keywords: how to start, activate OIXA, create wallet, convert tokens, "
+                "what is OIXA, how do I earn, how do I hire agents."
             )
             args_schema: type = OnboardingInput
-            _base_url:   str  = velun_base_url
+            _base_url:   str  = oixa_base_url
             _channel:    str  = channel
 
             def _run(self, wallet_address=None, agent_name="Mi Agente", message=None) -> str:
@@ -205,7 +205,7 @@ def onboarding_tool(
                 result = await check_and_onboard(wallet_address, None, agent_name, self._channel, self._base_url, False)
                 return result.get("message", "")
 
-        return VELUNOnboardingTool()
+        return OIXAOnboardingTool()
 
     except ImportError:
         logger.warning("langchain-core not installed — onboarding_tool() unavailable")
@@ -214,12 +214,12 @@ def onboarding_tool(
 
 # ── CrewAI onboarding tool ────────────────────────────────────────────────────
 
-def onboarding_crewai_tool(velun_base_url: str = VELUN_BASE_URL):
+def onboarding_crewai_tool(oixa_base_url: str = OIXA_BASE_URL):
     """
-    Returns a CrewAI BaseTool for VELUN onboarding.
+    Returns a CrewAI BaseTool for OIXA onboarding.
 
     Usage:
-        from velun_onboarding import onboarding_crewai_tool
+        from oixa_onboarding import onboarding_crewai_tool
         agent = Agent(role="...", tools=[onboarding_crewai_tool()])
     """
     try:
@@ -231,10 +231,10 @@ def onboarding_crewai_tool(velun_base_url: str = VELUN_BASE_URL):
             agent_name:     str           = Field("Mi Agente")
             message:        Optional[str] = Field(None)
 
-        class VELUNOnboardingCrewAI(BaseTool):
-            name:        str = "VELUN Onboarding"
+        class OIXAOnboardingCrewAI(BaseTool):
+            name:        str = "OIXA Onboarding"
             description: str = (
-                "Start VELUN Protocol onboarding — activate the agent economy for a new user. "
+                "Start OIXA Protocol onboarding — activate the agent economy for a new user. "
                 "Handles: no wallet, token conversion, activation, FAQ in simple language."
             )
             args_schema: type = OnboardingInput
@@ -242,24 +242,24 @@ def onboarding_crewai_tool(velun_base_url: str = VELUN_BASE_URL):
             def _run(self, wallet_address=None, agent_name="Mi Agente", message=None) -> str:
                 if message:
                     import asyncio
-                    return asyncio.run(onboarding_chat(message, wallet_address, "terminal", velun_base_url))
-                result = check_and_onboard_sync(wallet_address, None, agent_name, "terminal", velun_base_url, False)
+                    return asyncio.run(onboarding_chat(message, wallet_address, "terminal", oixa_base_url))
+                result = check_and_onboard_sync(wallet_address, None, agent_name, "terminal", oixa_base_url, False)
                 return result.get("message", "")
 
-        return VELUNOnboardingCrewAI()
+        return OIXAOnboardingCrewAI()
     except ImportError:
         return None
 
 
 # ── AutoGen onboarding function ───────────────────────────────────────────────
 
-def velun_onboard_user(
+def oixa_onboard_user(
     wallet_address: Optional[str] = None,
     agent_name:     str = "Mi Agente",
     message:        Optional[str] = None,
 ) -> str:
     """
-    AutoGen-compatible function for VELUN onboarding.
+    AutoGen-compatible function for OIXA onboarding.
 
     Args:
         wallet_address: User's wallet address (Annotated for AutoGen)
@@ -284,14 +284,14 @@ async def handle_telegram_onboarding(
     telegram_user_id: int,
     wallet_address:   Optional[str] = None,
     message_text:     Optional[str] = None,
-    velun_base_url:    str           = VELUN_BASE_URL,
+    oixa_base_url:    str           = OIXA_BASE_URL,
 ) -> dict:
     """
-    Handles VELUN onboarding for a Telegram user.
+    Handles OIXA onboarding for a Telegram user.
     Returns a dict with 'text' and 'reply_markup' for Telegram Bot API.
 
     Usage in telegram handler:
-        from velun_onboarding import handle_telegram_onboarding
+        from oixa_onboarding import handle_telegram_onboarding
         result = await handle_telegram_onboarding(update.effective_user.id, wallet)
         await update.message.reply_text(result['text'], reply_markup=result.get('reply_markup'))
     """
@@ -299,7 +299,7 @@ async def handle_telegram_onboarding(
     agent_name = f"Agente TG {telegram_user_id}"
 
     if message_text:
-        resp = await onboarding_chat(message_text, wallet_address, "telegram", velun_base_url)
+        resp = await onboarding_chat(message_text, wallet_address, "telegram", oixa_base_url)
         return {
             "text":         resp,
             "reply_markup": None,
@@ -310,7 +310,7 @@ async def handle_telegram_onboarding(
         agent_id=agent_id,
         agent_name=agent_name,
         channel="telegram",
-        velun_base_url=velun_base_url,
+        oixa_base_url=oixa_base_url,
         auto_print=False,
     )
 
@@ -331,13 +331,13 @@ async def handle_telegram_onboarding(
 
 class NeMoOnboardingSkill:
     """
-    NemoClaw skill for VELUN onboarding.
+    NemoClaw skill for OIXA onboarding.
     Auto-triggers when an NeMo agent encounters a user who isn't set up yet.
     """
 
-    name        = "velun_onboarding"
+    name        = "oixa_onboarding"
     description = (
-        "Activate VELUN Protocol for a new user in simple language. "
+        "Activate OIXA Protocol for a new user in simple language. "
         "Detects state (no wallet, has tokens, ready) and guides step by step. "
         "Keywords: activate, setup, start earning, convert tokens, create account."
     )
@@ -348,7 +348,7 @@ class NeMoOnboardingSkill:
         agent_name:     str = "Mi Agente",
         message:        Optional[str] = None,
     ) -> str:
-        return velun_onboard_user(wallet_address, agent_name, message)
+        return oixa_onboard_user(wallet_address, agent_name, message)
 
     def to_nemo_skill(self) -> dict:
         return {
@@ -370,25 +370,25 @@ class NeMoOnboardingSkill:
 
 async def run_interactive_onboarding(
     wallet_address: Optional[str] = None,
-    velun_base_url:  str = VELUN_BASE_URL,
+    oixa_base_url:  str = OIXA_BASE_URL,
 ) -> None:
     """
     Runs an interactive onboarding session in the terminal.
     Useful for testing and for agents running in terminal environments.
     """
     print("\n" + "═" * 60)
-    print("  🌐 VELUN Protocol — Asistente de Activación")
+    print("  🌐 OIXA Protocol — Asistente de Activación")
     print("═" * 60)
 
     result = await check_and_onboard(
         wallet_address=wallet_address,
         channel="terminal",
-        velun_base_url=velun_base_url,
+        oixa_base_url=oixa_base_url,
         auto_print=True,
     )
 
     if result.get("is_ready"):
-        print("✅ Tu agente ya está activo en VELUN.")
+        print("✅ Tu agente ya está activo en OIXA.")
         return
 
     # Interactive loop
@@ -406,14 +406,14 @@ async def run_interactive_onboarding(
                 else:
                     message = choice
 
-                response = await onboarding_chat(message, wallet_address, "terminal", velun_base_url)
+                response = await onboarding_chat(message, wallet_address, "terminal", oixa_base_url)
                 print("\n" + "─" * 60)
                 print(response)
                 print("─" * 60)
 
                 # Check if done
                 if any(w in response.lower() for w in ["activo", "activado", "empezar a ganar"]):
-                    print("\n🎉 ¡Listo! Tu agente está operando en VELUN.")
+                    print("\n🎉 ¡Listo! Tu agente está operando en OIXA.")
                     break
             else:
                 break

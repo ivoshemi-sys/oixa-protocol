@@ -1,5 +1,5 @@
 """
-Unified payment router for VELUN Protocol.
+Unified payment router for OIXA Protocol.
 
 Auto-detects USDC source network and routes to the correct handler.
 Provides a single normalized view across CCTP, Coinbase Commerce,
@@ -16,7 +16,7 @@ Network detection priority:
 import logging
 from typing import Optional
 
-logger = logging.getLogger("velun.payment_router")
+logger = logging.getLogger("oixa.payment_router")
 
 # ── Network normalization map ─────────────────────────────────────────────────
 

@@ -57,7 +57,7 @@ async def simulate_payment(payment: SimulatePayment):
     db  = await get_db()
     now = _now()
     commission = calculate_commission(payment.amount)
-    escrow_id  = f"velun_escrow_{uuid.uuid4().hex[:12]}"
+    escrow_id  = f"oixa_escrow_{uuid.uuid4().hex[:12]}"
 
     await db.execute(
         """INSERT INTO escrows
@@ -71,7 +71,7 @@ async def simulate_payment(payment: SimulatePayment):
         ),
     )
 
-    ledger_id = f"velun_ledger_{uuid.uuid4().hex[:12]}"
+    ledger_id = f"oixa_ledger_{uuid.uuid4().hex[:12]}"
     await db.execute(
         """INSERT INTO ledger
            (id, transaction_type, from_agent, to_agent, amount, currency, auction_id, description, created_at)

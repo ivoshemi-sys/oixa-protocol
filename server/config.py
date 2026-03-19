@@ -3,13 +3,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-VELUN_HOST = os.getenv("VELUN_HOST", "0.0.0.0")
-VELUN_PORT = int(os.getenv("VELUN_PORT", "8000"))
-VELUN_DEBUG = os.getenv("VELUN_DEBUG", "true").lower() == "true"
+OIXA_HOST = os.getenv("OIXA_HOST", "0.0.0.0")
+OIXA_PORT = int(os.getenv("OIXA_PORT", "8000"))
+OIXA_DEBUG = os.getenv("OIXA_DEBUG", "true").lower() == "true"
 OPENCLAW_URL = os.getenv("OPENCLAW_URL", "ws://127.0.0.1:18789")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TELEGRAM_OWNER_ID = int(os.getenv("TELEGRAM_OWNER_ID", "0") or "0")
-DB_PATH = os.getenv("DB_PATH", "./velun.db")
+DB_PATH = os.getenv("DB_PATH", "./oixa.db")
 DATABASE_URL = os.getenv("DATABASE_URL", "")  # postgresql://user:pass@host:5432/db
 COMMISSION_RATE = float(os.getenv("COMMISSION_RATE", "0.05"))
 MAX_REQUESTS_PER_MINUTE = int(os.getenv("MAX_REQUESTS_PER_MINUTE", "50"))

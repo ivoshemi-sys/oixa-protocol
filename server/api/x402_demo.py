@@ -1,5 +1,5 @@
 """
-x402 Payment Protocol — demo endpoints for VELUN Protocol.
+x402 Payment Protocol — demo endpoints for OIXA Protocol.
 
 Endpoints:
   GET /x402/status           → free — shows x402 config and payment addresses
@@ -11,7 +11,7 @@ Endpoints:
 How to pay (manual curl example):
   1. Hit endpoint → get 402 with PAYMENT-REQUIRED header
   2. Decode PAYMENT-REQUIRED (base64 JSON) to get payment details
-  3. Sign EIP-3009 authorization off-chain (use VELUN agent SDK or wagmi/viem)
+  3. Sign EIP-3009 authorization off-chain (use OIXA agent SDK or wagmi/viem)
   4. Retry with header: X-PAYMENT: <base64-encoded payment proof>
   5. Read X-PAYMENT-RESPONSE header in 200 response for settlement proof
 """
@@ -72,7 +72,7 @@ async def x402_status():
             "path":        "/api/v1/x402/intel",
             "price_usdc":  0.01,
             "price_units": usdc_to_units(0.01),
-            "description": "VELUN market intelligence — avg prices, volume, top agents",
+            "description": "OIXA market intelligence — avg prices, volume, top agents",
             "payment_required_preview": encode_b64(
                 build_payment_requirements(0.01, "/api/v1/x402/intel", "Market intel", pay_to)
             ),
@@ -139,10 +139,10 @@ async def x402_status():
 @router.get("/intel")
 async def intel_report(
     request: Request,
-    payment=Depends(require_payment(0.01, "VELUN market intelligence — $0.01 USDC")),
+    payment=Depends(require_payment(0.01, "OIXA market intelligence — $0.01 USDC")),
 ):
     """
-    $0.01 USDC — Market intelligence from the VELUN ledger.
+    $0.01 USDC — Market intelligence from the OIXA ledger.
 
     Returns aggregate stats: auction prices, volume, top agents, price index.
     Requires EIP-3009 payment proof in X-PAYMENT header.

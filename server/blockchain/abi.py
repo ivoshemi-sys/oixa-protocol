@@ -1,9 +1,9 @@
 """
-ABI definitions for VELUNEscrow and USDC (ERC-20 minimal) on Base mainnet.
-Derived from VELUNEscrow.sol (pragma solidity ^0.8.20).
+ABI definitions for OIXAEscrow and USDC (ERC-20 minimal) on Base mainnet.
+Derived from OIXAEscrow.sol (pragma solidity ^0.8.20).
 """
 
-VELUN_ESCROW_ABI = [
+OIXA_ESCROW_ABI = [
     # ── Constructor ──────────────────────────────────────────────────────────
     {
         "inputs": [
@@ -79,7 +79,7 @@ VELUN_ESCROW_ABI = [
                     {"internalType": "bytes32", "name": "auctionId",  "type": "bytes32"},
                     {"internalType": "uint256", "name": "createdAt",  "type": "uint256"}
                 ],
-                "internalType": "struct VELUNEscrow.Escrow",
+                "internalType": "struct OIXAEscrow.Escrow",
                 "name": "",
                 "type": "tuple"
             }

@@ -72,7 +72,7 @@ async def get_status():
     uptime_seconds = int(time.time() - _started_at)
 
     return {
-        "protocol": "VELUN",
+        "protocol": "OIXA",
         "version": PROTOCOL_VERSION,
         "phase": 1,
         "status": "operational",

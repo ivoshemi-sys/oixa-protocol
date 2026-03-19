@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import "forge-std/Script.sol";
 
 // Minimal import so forge can find the contract
-interface IVELUNEscrow {}
+interface IOIXAEscrow {}
 
 contract DeployEscrow is Script {
     function run() external {
@@ -15,7 +15,7 @@ contract DeployEscrow is Script {
 
         // Deploy via raw bytecode loaded from artifact
         bytes memory bytecode = abi.encodePacked(
-            vm.getCode("VELUNEscrow.sol:VELUNEscrow"),
+            vm.getCode("OIXAEscrow.sol:OIXAEscrow"),
             abi.encode(usdc, protocol)
         );
 
@@ -27,6 +27,6 @@ contract DeployEscrow is Script {
 
         vm.stopBroadcast();
 
-        console.log("VELUNEscrow deployed to:", deployed);
+        console.log("OIXAEscrow deployed to:", deployed);
     }
 }

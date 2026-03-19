@@ -1,8 +1,8 @@
 #!/bin/bash
 cd "$(dirname "$0")/.."
-if [ -f velun.pid ]; then
-    kill $(cat velun.pid) && rm velun.pid
-    echo "🛑 VELUN Protocol stopped"
+if [ -f oixa.pid ]; then
+    kill $(cat oixa.pid) && rm oixa.pid
+    echo "🛑 OIXA Protocol stopped"
 else
     echo "No PID file found"
 fi

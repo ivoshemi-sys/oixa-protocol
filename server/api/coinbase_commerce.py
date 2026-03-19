@@ -1,5 +1,5 @@
 """
-Coinbase Commerce endpoints for VELUN Protocol.
+Coinbase Commerce endpoints for OIXA Protocol.
 
 Hosted USDC payment pages — accept USDC from any network via Coinbase.
 Coinbase handles chain detection automatically (Ethereum, Base, Polygon,
@@ -46,8 +46,8 @@ def _ok(data):
 
 class CreateChargeRequest(BaseModel):
     amount_usdc:  float
-    name:         str = "VELUN Protocol Payment"
-    description:  str = "USDC payment for VELUN agent services"
+    name:         str = "OIXA Protocol Payment"
+    description:  str = "USDC payment for OIXA agent services"
     auction_id:   Optional[str] = None
     agent_id:     Optional[str] = None
     metadata:     Optional[dict] = None
@@ -118,7 +118,7 @@ async def create_commerce_charge(req: CreateChargeRequest):
     from database import get_db
 
     db  = await get_db()
-    lid = f"velun_cb_{uuid.uuid4().hex[:12]}"
+    lid = f"oixa_cb_{uuid.uuid4().hex[:12]}"
     now = _TS()
 
     await db.execute(
@@ -142,7 +142,7 @@ async def create_commerce_charge(req: CreateChargeRequest):
     await db.commit()
 
     return _ok({
-        "velun_charge_id":  lid,
+        "oixa_charge_id":  lid,
         "coinbase_charge_id": charge.get("id"),
         "charge_code":     charge.get("code"),
         "hosted_url":      charge.get("hosted_url"),

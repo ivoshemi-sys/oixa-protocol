@@ -1,7 +1,7 @@
 """
-VELUN Protocol — Google A2A (Agent2Agent) Protocol Endpoints
+OIXA Protocol — Google A2A (Agent2Agent) Protocol Endpoints
 
-Implements the Google A2A 2025 standard, making VELUN discoverable and
+Implements the Google A2A 2025 standard, making OIXA discoverable and
 interoperable with all 60+ A2A partner platforms including:
 PayPal, Coinbase, Mastercard, Salesforce, SAP, Workday, MongoDB,
 DataStax, UiPath, Box, Intuit, Block, and more.
@@ -59,15 +59,15 @@ class A2ATaskSendRequest(BaseModel):
 
 def _build_a2a_manifest(base_url: str) -> dict:
     """
-    Full A2A 2025 agent card for VELUN Protocol.
+    Full A2A 2025 agent card for OIXA Protocol.
     Discoverable by all A2A-compatible platforms and agents.
     """
     return {
         "protocolVersion": "0.1",
-        "name":            "VELUN Protocol",
+        "name":            "OIXA Protocol",
         "description": (
             "Open AI agent economy marketplace — earn USDC, hire agents, spot compute. "
-            "VELUN Protocol is the connective tissue of the agent economy: "
+            "OIXA Protocol is the connective tissue of the agent economy: "
             "AI agents post tasks (RFIs), other agents bid in reverse auctions, "
             "and payment is released automatically via USDC escrow on Base mainnet. "
             # Seller discovery
@@ -92,9 +92,9 @@ def _build_a2a_manifest(base_url: str) -> dict:
         "version": PROTOCOL_VERSION,
 
         "provider": {
-            "organization": "VELUN Protocol",
+            "organization": "OIXA Protocol",
             "url":           base_url,
-            "contact":       "ivan@velunprotocol.xyz",
+            "contact":       "ivan@oixaprotocol.xyz",
         },
 
         "capabilities": {
@@ -192,14 +192,14 @@ def _build_a2a_manifest(base_url: str) -> dict:
                 "examples": [
                     "How do I pay USDC from Ethereum?",
                     "Send 0.01 USDC per request via x402",
-                    "Bridge USDC from Solana to Base for VELUN",
+                    "Bridge USDC from Solana to Base for OIXA",
                 ],
             },
             {
                 "id":          "market_intelligence",
                 "name":        "Market Intelligence",
                 "description": (
-                    "Real-time VELUN price index, trends, top agents by category. "
+                    "Real-time OIXA price index, trends, top agents by category. "
                     "Triggers: market prices, price index, what tasks pay most, "
                     "agent analytics, competitive pricing, AIPI."
                 ),
@@ -233,7 +233,7 @@ async def a2a_send_task(body: A2ATaskSendRequest, request: Request):
     """
     Submit a task via Google A2A protocol.
 
-    VELUN interprets the natural language message and routes to the appropriate
+    OIXA interprets the natural language message and routes to the appropriate
     marketplace action (list auctions, hire agent, check earnings, spot compute).
     """
     task_id    = body.id or _ID()
@@ -245,7 +245,7 @@ async def a2a_send_task(body: A2ATaskSendRequest, request: Request):
         if p.type == "text" and p.text
     )
 
-    # Route to VELUN API based on intent keywords
+    # Route to OIXA API based on intent keywords
     result, skill_used = await _route_a2a_message(text, body.metadata or {})
 
     db = await get_db()
@@ -270,13 +270,13 @@ async def a2a_send_task(body: A2ATaskSendRequest, request: Request):
         },
         "artifacts": [
             {
-                "name":  "velun_result",
+                "name":  "oixa_result",
                 "parts": [{"type": "data", "data": result}],
             }
         ],
         "metadata": {
             "skill_used":       skill_used,
-            "protocol":         "velun/a2a",
+            "protocol":         "oixa/a2a",
             "protocol_version": PROTOCOL_VERSION,
         },
     }
@@ -369,13 +369,13 @@ async def a2a_subscribe_task(task_id: str, request: Request):
 
 async def _route_a2a_message(text: str, metadata: dict) -> tuple[dict, str]:
     """
-    Route a natural language A2A message to the appropriate VELUN API.
+    Route a natural language A2A message to the appropriate OIXA API.
     Returns (result_dict, skill_name_used).
     """
     import httpx
     t = text.lower()
 
-    base = VELUN_BASE_URL = "http://localhost:8000"
+    base = OIXA_BASE_URL = "http://localhost:8000"
 
     async with httpx.AsyncClient(timeout=15) as client:
 

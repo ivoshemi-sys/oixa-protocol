@@ -1,5 +1,5 @@
 """
-Telegram notifier for VELUN Protocol.
+Telegram notifier for OIXA Protocol.
 Sends alerts to Ivan for key protocol events.
 Falls back silently if Telegram is not configured.
 """
@@ -99,6 +99,6 @@ async def notify_emergency_pause(paused: bool, by: str = "protocol") -> None:
 
 async def notify_server_start(mode: str) -> None:
     await send_alert(
-        f"🚀 <b>VELUN Protocol started</b>\n"
+        f"🚀 <b>OIXA Protocol started</b>\n"
         f"Mode: <b>{mode}</b>"
     )

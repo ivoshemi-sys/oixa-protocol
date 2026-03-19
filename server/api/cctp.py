@@ -1,5 +1,5 @@
 """
-Circle CCTP (Cross-Chain Transfer Protocol) endpoints for VELUN Protocol.
+Circle CCTP (Cross-Chain Transfer Protocol) endpoints for OIXA Protocol.
 
 Receive USDC from any chain → Base mainnet automatically.
 
@@ -108,7 +108,7 @@ async def deposit_instructions(source_chain: str, amount_usdc: float = 1.0):
             f"2. Call TokenMessenger.depositForBurn with the params shown in instructions.function_call",
             f"3. Copy the tx hash from step 2",
             f"4. POST /api/v1/payments/cctp/submit with source_chain, source_tx_hash, amount_usdc",
-            f"5. VELUN will auto-complete the bridge (attestation + receiveMessage on Base)",
+            f"5. OIXA will auto-complete the bridge (attestation + receiveMessage on Base)",
             f"6. Poll GET /api/v1/payments/cctp/status/{{id}} until status=completed",
         ],
     })
@@ -120,7 +120,7 @@ async def submit_cctp_transfer(req: SubmitTransferRequest):
     Register a CCTP burn transaction for automated bridging to Base.
 
     After the sender calls depositForBurn on source chain, submit the tx hash here.
-    VELUN will fetch the MessageSent event, get Circle attestation, and call
+    OIXA will fetch the MessageSent event, get Circle attestation, and call
     receiveMessage on Base — minting USDC directly to the protocol wallet.
     """
     if req.source_chain not in CHAINS:
@@ -147,7 +147,7 @@ async def submit_cctp_transfer(req: SubmitTransferRequest):
     from database import get_db
 
     db  = await get_db()
-    tid = f"velun_cctp_{uuid.uuid4().hex[:12]}"
+    tid = f"oixa_cctp_{uuid.uuid4().hex[:12]}"
     now = _TS()
 
     await db.execute(

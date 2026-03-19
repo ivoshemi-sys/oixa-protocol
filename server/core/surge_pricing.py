@@ -1,5 +1,5 @@
 """
-VELUN Protocol — Surge Pricing Engine
+OIXA Protocol — Surge Pricing Engine
 
 Dynamic pricing for spot compute capacity based on:
 - Time-of-day demand patterns (peak/off-peak)

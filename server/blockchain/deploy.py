@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Deploy VELUNEscrow to Base mainnet (or Base Sepolia for testing).
+Deploy OIXAEscrow to Base mainnet (or Base Sepolia for testing).
 
 Usage:
     cd server
@@ -69,7 +69,7 @@ async def deploy(testnet: bool = False):
         sys.exit(1)
 
     # ── Compile ──────────────────────────────────────────────────────────────
-    print("\nCompiling VELUNEscrow.sol with solc 0.8.20...")
+    print("\nCompiling OIXAEscrow.sol with solc 0.8.20...")
     try:
         solcx.install_solc("0.8.20", show_progress=False)
         solcx.set_solc_version("0.8.20")
@@ -77,7 +77,7 @@ async def deploy(testnet: bool = False):
         print(f"❌ solc install failed: {e}")
         sys.exit(1)
 
-    sol_file = Path(__file__).parent / "contracts" / "VELUNEscrow.sol"
+    sol_file = Path(__file__).parent / "contracts" / "OIXAEscrow.sol"
     compiled = solcx.compile_files(
         [str(sol_file)],
         output_values=["abi", "bin"],
@@ -85,7 +85,7 @@ async def deploy(testnet: bool = False):
         optimize_runs=200,
     )
 
-    key = f"{sol_file}:VELUNEscrow"
+    key = f"{sol_file}:OIXAEscrow"
     contract_data = compiled[key]
     abi      = contract_data["abi"]
     bytecode = contract_data["bin"]
@@ -98,7 +98,7 @@ async def deploy(testnet: bool = False):
     print(f"\nUSDS address:     {usdc_addr}")
     print(f"Protocol wallet:  {protocol_addr}")
 
-    confirm = input("\nDeploy VELUNEscrow? [y/N]: ").strip().lower()
+    confirm = input("\nDeploy OIXAEscrow? [y/N]: ").strip().lower()
     if confirm != "y":
         print("Aborted.")
         sys.exit(0)
@@ -135,7 +135,7 @@ async def deploy(testnet: bool = False):
         sys.exit(1)
 
     contract_address = receipt["contractAddress"]
-    print(f"\n✅ VELUNEscrow deployed successfully!")
+    print(f"\n✅ OIXAEscrow deployed successfully!")
     print(f"   Address:  {contract_address}")
     print(f"   Block:    {receipt['blockNumber']}")
     print(f"   Gas used: {receipt['gasUsed']:,}")

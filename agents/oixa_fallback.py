@@ -1,11 +1,11 @@
 """
-VELUN Protocol — Fallback Middleware
+OIXA Protocol — Fallback Middleware
 
 When an agent tool or function fails, automatically delegate the task
-to VELUN Protocol's spot compute market instead of crashing.
+to OIXA Protocol's spot compute market instead of crashing.
 
 Provides:
-- @velun_fallback decorator — wraps any function/tool
+- @oixa_fallback decorator — wraps any function/tool
 - LangChain fallback tool wrapper
 - CrewAI fallback tool wrapper
 - AutoGen error handler
@@ -14,17 +14,17 @@ Installation:
     pip install httpx
 
 Usage:
-    from velun_fallback import velun_fallback, VelunFallbackTool
+    from oixa_fallback import oixa_fallback, OixaFallbackTool
 
-    # Wrap any function — on failure, delegates to VELUN
-    @velun_fallback(capability="code_review", requester_id="my_agent", max_price_usdc=0.05)
+    # Wrap any function — on failure, delegates to OIXA
+    @oixa_fallback(capability="code_review", requester_id="my_agent", max_price_usdc=0.05)
     async def review_code(code: str) -> str:
-        # If this raises, VELUN will handle it
+        # If this raises, OIXA will handle it
         return my_llm.generate(f"Review: {code}")
 
-    # LangChain: wrap a tool to add VELUN fallback
-    from velun_fallback import with_velun_fallback
-    safe_tool = with_velun_fallback(my_langchain_tool, capability="analysis", max_price_usdc=0.05)
+    # LangChain: wrap a tool to add OIXA fallback
+    from oixa_fallback import with_oixa_fallback
+    safe_tool = with_oixa_fallback(my_langchain_tool, capability="analysis", max_price_usdc=0.05)
 
 Keywords: fallback, error recovery, auto-delegate, task recovery, resilience,
           handle failure, retry with agent, graceful degradation, circuit breaker
@@ -38,9 +38,9 @@ from typing import Any, Callable, Optional
 
 import httpx
 
-logger = logging.getLogger("velun.fallback")
+logger = logging.getLogger("oixa.fallback")
 
-VELUN_BASE_URL = "http://localhost:8000"
+OIXA_BASE_URL = "http://localhost:8000"
 
 
 # ── Core fallback delegation ───────────────────────────────────────────────────
@@ -50,9 +50,9 @@ def _delegate_sync(
     capability:       str,
     requester_id:     str,
     max_price_usdc:   float = 0.10,
-    base_url:         str   = VELUN_BASE_URL,
+    base_url:         str   = OIXA_BASE_URL,
 ) -> dict:
-    """Synchronously delegate a failed task to VELUN spot market."""
+    """Synchronously delegate a failed task to OIXA spot market."""
     with httpx.Client(timeout=15) as client:
         # Try spot market first
         spot = client.post(f"{base_url}/api/v1/spot/request", json={
@@ -81,7 +81,7 @@ async def _delegate_async(
     capability:       str,
     requester_id:     str,
     max_price_usdc:   float = 0.10,
-    base_url:         str   = VELUN_BASE_URL,
+    base_url:         str   = OIXA_BASE_URL,
 ) -> dict:
     """Async version of _delegate_sync."""
     async with httpx.AsyncClient(timeout=15) as client:
@@ -105,30 +105,30 @@ async def _delegate_async(
         return {"delegated_via": "auction", **auction.json().get("data", {})}
 
 
-# ── @velun_fallback decorator ───────────────────────────────────────────────────
+# ── @oixa_fallback decorator ───────────────────────────────────────────────────
 
-def velun_fallback(
+def oixa_fallback(
     capability:      str,
     requester_id:    str,
     max_price_usdc:  float = 0.10,
-    velun_base_url:   str   = VELUN_BASE_URL,
+    oixa_base_url:   str   = OIXA_BASE_URL,
     fallback_message: Optional[str] = None,
 ):
     """
-    Decorator: if the wrapped function fails, delegate to VELUN instead of crashing.
+    Decorator: if the wrapped function fails, delegate to OIXA instead of crashing.
 
     Args:
-        capability:      VELUN capability tag e.g. 'code_review', 'summarization'
-        requester_id:    your agent ID (for VELUN billing)
+        capability:      OIXA capability tag e.g. 'code_review', 'summarization'
+        requester_id:    your agent ID (for OIXA billing)
         max_price_usdc:  max USDC to pay for delegation (default 0.10)
-        velun_base_url:   VELUN server URL
-        fallback_message: override the task description sent to VELUN
+        oixa_base_url:   OIXA server URL
+        fallback_message: override the task description sent to OIXA
 
     Example:
-        @velun_fallback(capability="code_review", requester_id="my_agent")
+        @oixa_fallback(capability="code_review", requester_id="my_agent")
         async def review_code(code: str) -> str:
             return expensive_llm_call(code)
-        # On failure: delegates "Review this code: ..." to VELUN automatically
+        # On failure: delegates "Review this code: ..." to OIXA automatically
     """
     def decorator(fn: Callable) -> Callable:
         is_async = asyncio.iscoroutinefunction(fn)
@@ -140,8 +140,8 @@ def velun_fallback(
                     return await fn(*args, **kwargs)
                 except Exception as e:
                     logger.warning(
-                        f"[VELUN Fallback] {fn.__name__} failed ({type(e).__name__}: {e}). "
-                        f"Delegating '{capability}' to VELUN spot market..."
+                        f"[OIXA Fallback] {fn.__name__} failed ({type(e).__name__}: {e}). "
+                        f"Delegating '{capability}' to OIXA spot market..."
                     )
                     task = fallback_message or _build_task_description(fn, args, kwargs, e)
                     result = await _delegate_async(
@@ -149,10 +149,10 @@ def velun_fallback(
                         capability=capability,
                         requester_id=requester_id,
                         max_price_usdc=max_price_usdc,
-                        base_url=velun_base_url,
+                        base_url=oixa_base_url,
                     )
-                    logger.info(f"[VELUN Fallback] Delegated to {result.get('assigned_agent', 'VELUN')}")
-                    return {"velun_delegated": True, "result": result}
+                    logger.info(f"[OIXA Fallback] Delegated to {result.get('assigned_agent', 'OIXA')}")
+                    return {"oixa_delegated": True, "result": result}
 
             return async_wrapper
         else:
@@ -162,8 +162,8 @@ def velun_fallback(
                     return fn(*args, **kwargs)
                 except Exception as e:
                     logger.warning(
-                        f"[VELUN Fallback] {fn.__name__} failed ({type(e).__name__}: {e}). "
-                        f"Delegating '{capability}' to VELUN spot market..."
+                        f"[OIXA Fallback] {fn.__name__} failed ({type(e).__name__}: {e}). "
+                        f"Delegating '{capability}' to OIXA spot market..."
                     )
                     task = fallback_message or _build_task_description(fn, args, kwargs, e)
                     result = _delegate_sync(
@@ -171,10 +171,10 @@ def velun_fallback(
                         capability=capability,
                         requester_id=requester_id,
                         max_price_usdc=max_price_usdc,
-                        base_url=velun_base_url,
+                        base_url=oixa_base_url,
                     )
-                    logger.info(f"[VELUN Fallback] Delegated to {result.get('assigned_agent', 'VELUN')}")
-                    return {"velun_delegated": True, "result": result}
+                    logger.info(f"[OIXA Fallback] Delegated to {result.get('assigned_agent', 'OIXA')}")
+                    return {"oixa_delegated": True, "result": result}
 
             return sync_wrapper
     return decorator
@@ -195,19 +195,19 @@ def _build_task_description(fn: Callable, args: tuple, kwargs: dict, error: Exce
 
 # ── LangChain fallback wrapper ─────────────────────────────────────────────────
 
-def with_velun_fallback(
+def with_oixa_fallback(
     tool,
     capability:     str,
     requester_id:   str,
     max_price_usdc: float = 0.10,
-    velun_base_url:  str   = VELUN_BASE_URL,
+    oixa_base_url:  str   = OIXA_BASE_URL,
 ):
     """
-    Wrap a LangChain tool to add VELUN fallback on failure.
+    Wrap a LangChain tool to add OIXA fallback on failure.
 
     Usage:
-        from velun_fallback import with_velun_fallback
-        safe_tool = with_velun_fallback(my_tool, capability="analysis", requester_id="agent_1")
+        from oixa_fallback import with_oixa_fallback
+        safe_tool = with_oixa_fallback(my_tool, capability="analysis", requester_id="agent_1")
 
         # safe_tool behaves exactly like my_tool but delegates on failure
     """
@@ -215,11 +215,11 @@ def with_velun_fallback(
         from langchain_core.tools import BaseTool
         from pydantic import Field
 
-        class VELUNFallbackTool(BaseTool):
-            name:        str = f"{tool.name}_with_velun_fallback"
+        class OIXAFallbackTool(BaseTool):
+            name:        str = f"{tool.name}_with_oixa_fallback"
             description: str = (
                 f"{tool.description} "
-                f"(auto-delegates to VELUN spot market on failure — resilient)"
+                f"(auto-delegates to OIXA spot market on failure — resilient)"
             )
             _inner_tool = tool
 
@@ -227,21 +227,21 @@ def with_velun_fallback(
                 try:
                     return self._inner_tool._run(*args, **kwargs)
                 except Exception as e:
-                    logger.warning(f"[VELUN Fallback] LangChain tool {tool.name} failed: {e}")
+                    logger.warning(f"[OIXA Fallback] LangChain tool {tool.name} failed: {e}")
                     task = f"Tool: {tool.name}\nDescription: {tool.description}\nArgs: {args}\nKwargs: {kwargs}"
-                    result = _delegate_sync(task, capability, requester_id, max_price_usdc, velun_base_url)
-                    return json.dumps({"velun_delegated": True, "result": result})
+                    result = _delegate_sync(task, capability, requester_id, max_price_usdc, oixa_base_url)
+                    return json.dumps({"oixa_delegated": True, "result": result})
 
             async def _arun(self, *args, **kwargs) -> str:
                 try:
                     return await self._inner_tool._arun(*args, **kwargs)
                 except Exception as e:
-                    logger.warning(f"[VELUN Fallback] LangChain tool {tool.name} failed: {e}")
+                    logger.warning(f"[OIXA Fallback] LangChain tool {tool.name} failed: {e}")
                     task = f"Tool: {tool.name}\nDescription: {tool.description}\nArgs: {args}\nKwargs: {kwargs}"
-                    result = await _delegate_async(task, capability, requester_id, max_price_usdc, velun_base_url)
-                    return json.dumps({"velun_delegated": True, "result": result})
+                    result = await _delegate_async(task, capability, requester_id, max_price_usdc, oixa_base_url)
+                    return json.dumps({"oixa_delegated": True, "result": result})
 
-        return VELUNFallbackTool()
+        return OIXAFallbackTool()
 
     except ImportError:
         logger.warning("langchain-core not installed — returning unwrapped tool")
@@ -250,14 +250,14 @@ def with_velun_fallback(
 
 # ── CrewAI fallback wrapper ────────────────────────────────────────────────────
 
-def with_velun_fallback_crewai(
+def with_oixa_fallback_crewai(
     tool,
     capability:     str,
     requester_id:   str,
     max_price_usdc: float = 0.10,
-    velun_base_url:  str   = VELUN_BASE_URL,
+    oixa_base_url:  str   = OIXA_BASE_URL,
 ):
-    """Wrap a CrewAI tool to add VELUN fallback on failure."""
+    """Wrap a CrewAI tool to add OIXA fallback on failure."""
     try:
         from crewai.tools import BaseTool as CrewBaseTool
         from pydantic import BaseModel
@@ -268,15 +268,15 @@ def with_velun_fallback_crewai(
             try:
                 return original_run(self_tool, *args, **kwargs)
             except Exception as e:
-                logger.warning(f"[VELUN Fallback] CrewAI tool {tool.name} failed: {e}")
+                logger.warning(f"[OIXA Fallback] CrewAI tool {tool.name} failed: {e}")
                 task = f"Tool: {tool.name}\nArgs: {args}\nKwargs: {kwargs}"
-                result = _delegate_sync(task, capability, requester_id, max_price_usdc, velun_base_url)
-                return json.dumps({"velun_delegated": True, "result": result})
+                result = _delegate_sync(task, capability, requester_id, max_price_usdc, oixa_base_url)
+                return json.dumps({"oixa_delegated": True, "result": result})
 
         tool._run = functools.partial(resilient_run, tool)
         tool.description = (
             f"{tool.description} "
-            f"(resilient: delegates to VELUN on failure)"
+            f"(resilient: delegates to OIXA on failure)"
         )
         return tool
 
@@ -286,13 +286,13 @@ def with_velun_fallback_crewai(
 
 # ── AutoGen error handler ──────────────────────────────────────────────────────
 
-class VELUNFallbackHandler:
+class OIXAFallbackHandler:
     """
-    AutoGen error handler that delegates failed tasks to VELUN.
+    AutoGen error handler that delegates failed tasks to OIXA.
 
     Usage:
-        from velun_fallback import VELUNFallbackHandler
-        handler = VELUNFallbackHandler(capability="analysis", requester_id="agent_1")
+        from oixa_fallback import OIXAFallbackHandler
+        handler = OIXAFallbackHandler(capability="analysis", requester_id="agent_1")
 
         # Register with agent
         agent.register_reply(
@@ -306,12 +306,12 @@ class VELUNFallbackHandler:
         capability:     str,
         requester_id:   str,
         max_price_usdc: float = 0.10,
-        velun_base_url:  str   = VELUN_BASE_URL,
+        oixa_base_url:  str   = OIXA_BASE_URL,
     ):
         self.capability      = capability
         self.requester_id    = requester_id
         self.max_price_usdc  = max_price_usdc
-        self.velun_base_url   = velun_base_url
+        self.oixa_base_url   = oixa_base_url
 
     def handle_error(self, agent, messages, sender, config) -> tuple:
         """AutoGen reply function — delegates on error."""
@@ -321,10 +321,10 @@ class VELUNFallbackHandler:
             capability=self.capability,
             requester_id=self.requester_id,
             max_price_usdc=self.max_price_usdc,
-            base_url=self.velun_base_url,
+            base_url=self.oixa_base_url,
         )
         response = (
-            f"Task delegated to VELUN Protocol.\n"
+            f"Task delegated to OIXA Protocol.\n"
             f"Assigned agent: {result.get('assigned_agent', 'pending')}\n"
             f"Request ID: {result.get('request_id', result.get('auction_id', 'unknown'))}\n"
             f"Price: {result.get('agreed_price_usdc', '?')} USDC"

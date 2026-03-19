@@ -29,7 +29,7 @@ def _error(msg: str, code: str, status_code: int = 400):
 @router.post("/offers")
 async def create_offer(offer: OfferCreate):
     db = await get_db()
-    offer_id = f"velun_offer_{uuid.uuid4().hex[:12]}"
+    offer_id = f"oixa_offer_{uuid.uuid4().hex[:12]}"
     now = _now()
     capabilities_json = json.dumps(offer.capabilities)
     await db.execute(

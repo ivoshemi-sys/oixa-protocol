@@ -14,7 +14,7 @@ from datetime import datetime, timezone
 
 from config import ANTHROPIC_API_KEY, ARBITER_MODEL, ARBITER_MAX_TOKENS
 
-logger = logging.getLogger("velun.arbiter")
+logger = logging.getLogger("oixa.arbiter")
 
 # Cost estimates per model (USD per 1M tokens, approximate)
 _MODEL_COSTS = {
@@ -24,7 +24,7 @@ _MODEL_COSTS = {
 }
 
 ARBITER_PROMPT = """\
-You are an impartial arbiter for VELUN Protocol, an autonomous agent marketplace.
+You are an impartial arbiter for OIXA Protocol, an autonomous agent marketplace.
 Your task: determine whether a delivered AI output satisfactorily fulfills the original task requirements.
 
 ## Original Task (RFI — Request for Intelligence)
@@ -229,7 +229,7 @@ async def _apply_verdict(db, dispute, auction, verdict: str, arbiter_cost: float
     net_payment = escrow["amount"] - commission
 
     def _lid():
-        return f"velun_ledger_{uuid.uuid4().hex[:12]}"
+        return f"oixa_ledger_{uuid.uuid4().hex[:12]}"
 
     if verdict == "agent_wins":
         # Agent wins: full payment released, fee given to agent as compensation
@@ -253,7 +253,7 @@ async def _apply_verdict(db, dispute, auction, verdict: str, arbiter_cost: float
             await db.execute(
                 """INSERT INTO ledger (id, transaction_type, from_agent, to_agent, amount, currency, auction_id, description, created_at)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (_lid(), "commission", winner_id, "velun_protocol", commission, "USDC", auction_id,
+                (_lid(), "commission", winner_id, "oixa_protocol", commission, "USDC", auction_id,
                  "Protocol commission after dispute: agent_wins", now),
             )
         # Dispute fee → agent (compensation for unfounded dispute)
@@ -270,7 +270,7 @@ async def _apply_verdict(db, dispute, auction, verdict: str, arbiter_cost: float
             await db.execute(
                 """INSERT INTO ledger (id, transaction_type, from_agent, to_agent, amount, currency, auction_id, description, created_at)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (_lid(), "arbiter_cost", "velun_protocol", "velun_protocol", arbiter_cost, "USDC", auction_id,
+                (_lid(), "arbiter_cost", "oixa_protocol", "oixa_protocol", arbiter_cost, "USDC", auction_id,
                  "Claude arbiter call cost", now),
             )
         # Slash agent stake (losing bidders already marked refunded; winner's stake released)
@@ -290,7 +290,7 @@ async def _apply_verdict(db, dispute, auction, verdict: str, arbiter_cost: float
         await db.execute(
             """INSERT INTO ledger (id, transaction_type, from_agent, to_agent, amount, currency, auction_id, description, created_at)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (_lid(), "refund", "velun_protocol", requester, escrow["amount"], "USDC", auction_id,
+            (_lid(), "refund", "oixa_protocol", requester, escrow["amount"], "USDC", auction_id,
              "Escrow refunded after dispute: requester_wins", now),
         )
         # Agent stake slashed
@@ -304,7 +304,7 @@ async def _apply_verdict(db, dispute, auction, verdict: str, arbiter_cost: float
         await db.execute(
             """INSERT INTO ledger (id, transaction_type, from_agent, to_agent, amount, currency, auction_id, description, created_at)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-            (_lid(), "slash", winner_id, "velun_protocol", stake, "USDC", auction_id,
+            (_lid(), "slash", winner_id, "oixa_protocol", stake, "USDC", auction_id,
              "Stake slashed after dispute: requester_wins", now),
         )
         await db.execute(
@@ -317,7 +317,7 @@ async def _apply_verdict(db, dispute, auction, verdict: str, arbiter_cost: float
             await db.execute(
                 """INSERT INTO ledger (id, transaction_type, from_agent, to_agent, amount, currency, auction_id, description, created_at)
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-                (_lid(), "dispute_fee_return", "velun_protocol", requester, fee_net, "USDC", auction_id,
+                (_lid(), "dispute_fee_return", "oixa_protocol", requester, fee_net, "USDC", auction_id,
                  "Dispute fee returned to requester (requester_wins)", now),
             )
         logger.info(f"[ARBITER] requester_wins: escrow refunded {escrow['amount']:.4f} USDC to {requester}")
@@ -327,6 +327,6 @@ async def _apply_verdict(db, dispute, auction, verdict: str, arbiter_cost: float
         await db.execute(
             """INSERT INTO protocol_revenue (id, source, amount, currency, auction_id, simulated, created_at)
                VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (f"velun_revenue_{uuid.uuid4().hex[:12]}", "arbiter_cost",
+            (f"oixa_revenue_{uuid.uuid4().hex[:12]}", "arbiter_cost",
              arbiter_cost, "USDC", auction_id, True, now),
         )

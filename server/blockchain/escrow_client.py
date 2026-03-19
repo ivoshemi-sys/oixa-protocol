@@ -14,7 +14,7 @@ import hashlib
 from decimal import Decimal
 from typing import Optional
 
-logger = logging.getLogger("velun.blockchain")
+logger = logging.getLogger("oixa.blockchain")
 
 # USDC has 6 decimals
 USDC_DECIMALS = 6
@@ -31,13 +31,13 @@ def _raw_to_usdc(raw: int) -> float:
 
 
 def _id_to_bytes32(id_str: str) -> bytes:
-    """Stable bytes32 from an VELUN ID string via SHA-256 (first 32 bytes)."""
+    """Stable bytes32 from an OIXA ID string via SHA-256 (first 32 bytes)."""
     return hashlib.sha256(id_str.encode()).digest()
 
 
 class BlockchainEscrowClient:
     """
-    Async client for VELUNEscrow contract on Base.
+    Async client for OIXAEscrow contract on Base.
     Instantiate once at startup via `escrow_client = BlockchainEscrowClient()`.
     Call `await escrow_client.init()` in FastAPI lifespan.
     """
@@ -68,7 +68,7 @@ class BlockchainEscrowClient:
         try:
             from web3 import AsyncWeb3, AsyncHTTPProvider
             from eth_account import Account
-            from blockchain.abi import VELUN_ESCROW_ABI, USDC_ABI, USDC_BASE_ADDRESS, BASE_CHAIN_ID
+            from blockchain.abi import OIXA_ESCROW_ABI, USDC_ABI, USDC_BASE_ADDRESS, BASE_CHAIN_ID
 
             w3 = AsyncWeb3(AsyncHTTPProvider(BASE_RPC_URL))
 
@@ -89,7 +89,7 @@ class BlockchainEscrowClient:
 
             contract = w3.eth.contract(
                 address=AsyncWeb3.to_checksum_address(ESCROW_CONTRACT_ADDRESS),
-                abi=VELUN_ESCROW_ABI,
+                abi=OIXA_ESCROW_ABI,
             )
             usdc = w3.eth.contract(
                 address=AsyncWeb3.to_checksum_address(usdc_addr),

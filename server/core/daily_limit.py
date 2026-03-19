@@ -1,5 +1,5 @@
 """
-Daily spending limit enforcement for VELUN Protocol.
+Daily spending limit enforcement for OIXA Protocol.
 Default: $50/day. Alerts Ivan at 80% and 100%.
 """
 
@@ -65,7 +65,7 @@ async def record_spending(amount: float, auction_id: str, description: str, db) 
     await db.execute(
         """INSERT INTO daily_spending (id, date, amount, auction_id, description, created_at)
            VALUES (?, ?, ?, ?, ?, ?)""",
-        (f"velun_spend_{uuid.uuid4().hex[:12]}", today, amount, auction_id, description, now),
+        (f"oixa_spend_{uuid.uuid4().hex[:12]}", today, amount, auction_id, description, now),
     )
     await db.commit()
     logger.debug(f"[DAILY_LIMIT] Recorded ${amount:.4f} | today_total ~${await get_daily_spent(db):.4f}")

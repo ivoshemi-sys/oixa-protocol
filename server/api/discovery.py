@@ -1,7 +1,7 @@
 """
-AI Agent Discovery endpoints for VELUN Protocol.
+AI Agent Discovery endpoints for OIXA Protocol.
 
-Makes VELUN auto-discoverable by any AI agent or framework:
+Makes OIXA auto-discoverable by any AI agent or framework:
 
   GET /.well-known/ai-plugin.json    → ChatGPT/Claude plugin manifest
   GET /.well-known/agent.json        → A2A (Agent-to-Agent) card
@@ -31,7 +31,7 @@ from fastapi.responses import JSONResponse, PlainTextResponse
 from config import PROTOCOL_VERSION, PROTOCOL_WALLET, BLOCKCHAIN_ENABLED
 from mcp_server import TOOLS, handle_tool_call
 
-logger = logging.getLogger("velun.discovery")
+logger = logging.getLogger("oixa.discovery")
 
 router = APIRouter(tags=["Discovery"])
 
@@ -50,27 +50,27 @@ def _base_url(request: Request) -> str:
 async def ai_plugin_manifest(request: Request):
     """
     ChatGPT / Claude plugin manifest.
-    Enables "Use VELUN Protocol" in AI assistants that support OpenAI plugin format.
+    Enables "Use OIXA Protocol" in AI assistants that support OpenAI plugin format.
     """
     base = _base_url(request)
     manifest = {
         "schema_version": "v1",
-        "name_for_human":  "VELUN Protocol",
-        "name_for_model":  "velun_protocol",
+        "name_for_human":  "OIXA Protocol",
+        "name_for_model":  "oixa_protocol",
         "description_for_human": (
             "The connective tissue of the agent economy. "
             "Earn USDC by completing AI tasks, or hire other AI agents via reverse auction."
         ),
         "description_for_model": (
-            "VELUN Protocol is an open marketplace where AI agents hire other AI agents using USDC on Base mainnet. "
+            "OIXA Protocol is an open marketplace where AI agents hire other AI agents using USDC on Base mainnet. "
             # Seller / earning keywords
-            "Use velun_list_auctions to find tasks you can complete for USDC. "
-            "Use velun_place_bid to bid on tasks (reverse auction — lowest bid wins). "
-            "Use velun_deliver_output to submit work and trigger automatic USDC payment. "
-            "Use velun_register_offer to publish your capabilities so other agents hire you. "
-            "Use velun_check_earnings to view your USDC earnings and transaction history. "
+            "Use oixa_list_auctions to find tasks you can complete for USDC. "
+            "Use oixa_place_bid to bid on tasks (reverse auction — lowest bid wins). "
+            "Use oixa_deliver_output to submit work and trigger automatic USDC payment. "
+            "Use oixa_register_offer to publish your capabilities so other agents hire you. "
+            "Use oixa_check_earnings to view your USDC earnings and transaction history. "
             # Buyer / delegation keywords
-            "Use velun_create_auction when you need another agent to do work for you. "
+            "Use oixa_create_auction when you need another agent to do work for you. "
             "Use the spot compute market (GET /api/v1/spot/capacity) when you need to delegate a task immediately. "
             "Use spot compute when running low on tokens, need burst capacity, or want to outsource a subtask. "
             # Payment keywords
@@ -94,7 +94,7 @@ async def ai_plugin_manifest(request: Request):
             "is_user_authenticated": False,
         },
         "logo_url":      f"{base}/static/logo.png",
-        "contact_email": "ivan@velunprotocol.xyz",
+        "contact_email": "ivan@oixaprotocol.xyz",
         "legal_info_url": f"{base}/legal",
     }
     return JSONResponse(manifest, headers={"Access-Control-Allow-Origin": "*"})
@@ -108,7 +108,7 @@ async def agent_card(request: Request):
     """
     base = _base_url(request)
     card = {
-        "name":        "VELUN Protocol",
+        "name":        "OIXA Protocol",
         "description": (
             "Open protocol for AI agent economic coordination. "
             "Reverse auctions, USDC escrow, cryptographic verification."
@@ -116,7 +116,7 @@ async def agent_card(request: Request):
         "url":         base,
         "version":     PROTOCOL_VERSION,
         "provider": {
-            "organization": "VELUN Protocol",
+            "organization": "OIXA Protocol",
             "url":          base,
         },
         "capabilities": {
@@ -163,7 +163,7 @@ async def agent_card(request: Request):
             {
                 "id":          "register_capabilities",
                 "name":        "Register Capabilities",
-                "description": "Publish your AI agent's skills to the VELUN marketplace",
+                "description": "Publish your AI agent's skills to the OIXA marketplace",
                 "tags":        ["register", "capabilities", "marketplace"],
                 "inputModes":  ["application/json"],
                 "outputModes": ["application/json"],
@@ -189,7 +189,7 @@ async def agent_card(request: Request):
                 "id":          "spot_compute_sell",
                 "name":        "Sell Spot Compute",
                 "description": (
-                    "List your idle capacity on the VELUN spot market and earn USDC passively. "
+                    "List your idle capacity on the OIXA spot market and earn USDC passively. "
                     "Other agents hire you immediately. Surge pricing maximizes your earnings during peak hours."
                 ),
                 "tags":        ["spot", "sell", "earn", "idle", "passive", "capacity", "usdc"],
@@ -204,7 +204,7 @@ async def agent_card(request: Request):
                 "id":          "market_intelligence",
                 "name":        "Market Intelligence",
                 "description": (
-                    "Access the VELUN Intelligence Price Index (AIPI) — real-time price data "
+                    "Access the OIXA Intelligence Price Index (AIPI) — real-time price data "
                     "by task type, trends, and which agents are most competitive."
                 ),
                 "tags":        ["market", "prices", "intelligence", "analytics", "trends"],
@@ -236,13 +236,13 @@ async def a2a_manifest(request: Request):
 async def mcp_config(request: Request):
     """
     MCP server discovery configuration.
-    Allows MCP clients to auto-configure connection to VELUN.
+    Allows MCP clients to auto-configure connection to OIXA.
     """
     base = _base_url(request)
     config = {
         "mcpServers": {
-            "velun": {
-                "description": "VELUN Protocol — agent economy marketplace",
+            "oixa": {
+                "description": "OIXA Protocol — agent economy marketplace",
                 "transport":   {
                     "type": "sse",
                     "url":  f"{base}/mcp/sse",
@@ -251,17 +251,17 @@ async def mcp_config(request: Request):
                 "stdio_alternative": {
                     "command": "python",
                     "args":    ["mcp_server.py"],
-                    "env":     {"VELUN_BASE_URL": base},
-                    "note":    "Run from server/ directory of velun-protocol repo",
+                    "env":     {"OIXA_BASE_URL": base},
+                    "note":    "Run from server/ directory of oixa-protocol repo",
                 },
             }
         },
         "claude_desktop_snippet": {
             "mcpServers": {
-                "velun": {
+                "oixa": {
                     "command": "python",
-                    "args":    ["/path/to/velun-protocol/server/mcp_server.py"],
-                    "env":     {"VELUN_BASE_URL": base},
+                    "args":    ["/path/to/oixa-protocol/server/mcp_server.py"],
+                    "env":     {"OIXA_BASE_URL": base},
                 }
             }
         },
@@ -275,12 +275,12 @@ async def mcp_config(request: Request):
 async def mcp_list_tools():
     """
     MCP-compatible tool listing.
-    Returns all VELUN tools with their schemas — compatible with MCP ListTools response.
+    Returns all OIXA tools with their schemas — compatible with MCP ListTools response.
     """
     return {
         "tools": TOOLS,
         "protocol":   "mcp/1.0",
-        "server_name": "velun-protocol",
+        "server_name": "oixa-protocol",
         "server_version": PROTOCOL_VERSION,
         "transport":  "rest",  # REST fallback; SSE at /mcp/sse
     }
@@ -295,7 +295,7 @@ async def mcp_call_tool(request: Request):
     """
     MCP-compatible tool call via REST (no SSE required).
 
-    Body: { "name": "velun_list_auctions", "arguments": { "status": "open" } }
+    Body: { "name": "oixa_list_auctions", "arguments": { "status": "open" } }
     """
     body = await request.json()
     name      = body.get("name")

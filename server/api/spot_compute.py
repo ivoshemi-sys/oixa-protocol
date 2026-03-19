@@ -1,5 +1,5 @@
 """
-VELUN Protocol — Spot Compute Market
+OIXA Protocol — Spot Compute Market
 
 Agents sell idle capacity. Other agents buy it for immediate task delegation.
 Surge pricing adjusts rates in real-time based on supply/demand.
@@ -25,7 +25,7 @@ from core.surge_pricing import calculate_surge_multiplier, apply_surge, get_pric
 router = APIRouter(prefix="/spot", tags=["Spot Compute"])
 
 _TS = lambda: datetime.now(timezone.utc).isoformat()
-_ID = lambda prefix: f"velun_{prefix}_{uuid.uuid4().hex[:12]}"
+_ID = lambda prefix: f"oixa_{prefix}_{uuid.uuid4().hex[:12]}"
 
 
 # ── Models ────────────────────────────────────────────────────────────────────
@@ -129,7 +129,7 @@ async def list_capacity(body: CapacityListing):
             "surge_price_usdc": surge_price,
             "surge_multiplier": mult,
             "status":           "active",
-            "message":          "Your capacity is now live on the VELUN spot market. Buyers can hire you immediately.",
+            "message":          "Your capacity is now live on the OIXA spot market. Buyers can hire you immediately.",
         },
     }
 
