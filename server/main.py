@@ -25,6 +25,7 @@ from api.coinbase_commerce import router as coinbase_router
 from api.circle_payments import router as circle_router
 from api.payment_hub import router as hub_router
 from api.discovery import router as discovery_router
+from api.spot_compute import router as spot_router
 
 logger = setup_logging()
 
@@ -126,6 +127,7 @@ hire AI agent · autonomous payment · CCTP bridge · x402 micropayment
         {"name": "Circle Payments",   "description": "Institutional USDC payments via Circle API"},
         {"name": "Payment Hub",       "description": "Unified payment detection and status"},
         {"name": "Discovery",         "description": "AI agent auto-discovery (MCP, A2A, OpenAI plugin)"},
+        {"name": "Spot Compute",      "description": "Spot compute market — agents sell idle capacity, surge pricing"},
         {"name": "Admin",             "description": "Protocol administration (pause, daily limits)"},
     ],
 )
@@ -153,6 +155,7 @@ app.include_router(cctp_router,      prefix="/api/v1")
 app.include_router(coinbase_router,  prefix="/api/v1")
 app.include_router(circle_router,    prefix="/api/v1")
 app.include_router(hub_router,       prefix="/api/v1")
+app.include_router(spot_router,          prefix="/api/v1")
 app.include_router(discovery_router)   # no prefix: handles /.well-known/ and /mcp/
 
 

@@ -404,6 +404,38 @@ CREATE TABLE IF NOT EXISTS circle_payments (
     agent_id TEXT,
     created_at TEXT NOT NULL,
     completed_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS capacity_listings (
+    id TEXT PRIMARY KEY,               -- axon_spot_xxx
+    agent_id TEXT NOT NULL,
+    agent_name TEXT NOT NULL,
+    capabilities TEXT NOT NULL,        -- JSON array of capability strings
+    base_price_usdc REAL NOT NULL,
+    surge_price_usdc REAL NOT NULL,
+    max_tasks INTEGER DEFAULT 1,
+    available_until TEXT,              -- ISO timestamp or NULL
+    wallet_address TEXT,
+    description TEXT,
+    status TEXT DEFAULT 'active',      -- active, retired, paused
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS spot_requests (
+    id TEXT PRIMARY KEY,               -- axon_sreq_xxx
+    requester_id TEXT NOT NULL,
+    listing_id TEXT NOT NULL,
+    agent_id TEXT NOT NULL,
+    capability TEXT NOT NULL,
+    task_description TEXT NOT NULL,
+    agreed_price_usdc REAL NOT NULL,
+    surge_multiplier REAL NOT NULL,
+    urgency TEXT DEFAULT 'normal',     -- normal, high, critical
+    status TEXT DEFAULT 'pending',     -- pending, completed, cancelled, disputed
+    created_at TEXT NOT NULL,
+    completed_at TEXT,
+    FOREIGN KEY (listing_id) REFERENCES capacity_listings(id)
 )
 """
 

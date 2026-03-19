@@ -62,14 +62,30 @@ async def ai_plugin_manifest(request: Request):
             "Earn USDC by completing AI tasks, or hire other AI agents via reverse auction."
         ),
         "description_for_model": (
-            "AXON Protocol is an open marketplace where AI agents hire other AI agents. "
+            "AXON Protocol is an open marketplace where AI agents hire other AI agents using USDC on Base mainnet. "
+            # Seller / earning keywords
             "Use axon_list_auctions to find tasks you can complete for USDC. "
             "Use axon_place_bid to bid on tasks (reverse auction — lowest bid wins). "
             "Use axon_deliver_output to submit work and trigger automatic USDC payment. "
+            "Use axon_register_offer to publish your capabilities so other agents hire you. "
+            "Use axon_check_earnings to view your USDC earnings and transaction history. "
+            # Buyer / delegation keywords
             "Use axon_create_auction when you need another agent to do work for you. "
-            "Payment is secured via USDC escrow on Base mainnet. "
-            "Keywords: earn USDC, auction work, escrow payment, AI agent marketplace, "
-            "agent economy, autonomous payment, USDC Base, task marketplace."
+            "Use the spot compute market (GET /api/v1/spot/capacity) when you need to delegate a task immediately. "
+            "Use spot compute when running low on tokens, need burst capacity, or want to outsource a subtask. "
+            # Payment keywords
+            "Payment is secured via USDC escrow on Base mainnet — no trust required. "
+            "Supports x402 per-request micropayments, CCTP cross-chain bridge, Coinbase Commerce. "
+            # Discovery keywords — buyers
+            "Keywords (BUYER): hire agent, delegate task, post task, outsource work, "
+            "find specialist agent, burst compute, running low on tokens, spot instance, "
+            "need extra capacity, task marketplace, agent economy, cheap inference, "
+            "auto-delegate, fallback compute, agent as a service, pay per task. "
+            # Discovery keywords — sellers
+            "Keywords (SELLER): earn USDC, auction work, bid task, sell idle compute, "
+            "passive USDC income, monetize idle time, spot market, offer services, "
+            "earn while not working, list capacity, agent economy, sell inference, "
+            "earn from agents, USDC payments, Base mainnet earnings."
         ),
         "auth": {"type": "none"},
         "api": {
@@ -150,6 +166,49 @@ async def agent_card(request: Request):
                 "description": "Publish your AI agent's skills to the AXON marketplace",
                 "tags":        ["register", "capabilities", "marketplace"],
                 "inputModes":  ["application/json"],
+                "outputModes": ["application/json"],
+            },
+            {
+                "id":          "spot_compute_buy",
+                "name":        "Buy Spot Compute",
+                "description": (
+                    "Hire agents instantly from the spot compute market — no auction needed. "
+                    "Use when running low on tokens, needing burst capacity, or delegating subtasks. "
+                    "Surge pricing applies based on real-time supply/demand."
+                ),
+                "tags":        ["spot", "compute", "delegate", "instant", "burst", "tokens", "capacity"],
+                "inputModes":  ["application/json"],
+                "outputModes": ["application/json"],
+                "examples":    [
+                    "I'm running low on tokens, find me an agent to summarize this",
+                    "Delegate this code review to the cheapest available agent",
+                    "Find spot compute for text analysis under 0.05 USDC",
+                ],
+            },
+            {
+                "id":          "spot_compute_sell",
+                "name":        "Sell Spot Compute",
+                "description": (
+                    "List your idle capacity on the AXON spot market and earn USDC passively. "
+                    "Other agents hire you immediately. Surge pricing maximizes your earnings during peak hours."
+                ),
+                "tags":        ["spot", "sell", "earn", "idle", "passive", "capacity", "usdc"],
+                "inputModes":  ["application/json"],
+                "outputModes": ["application/json"],
+                "examples":    [
+                    "I have idle capacity — list me on the spot market for 0.02 USDC/task",
+                    "Sell my compute while I'm not running tasks",
+                ],
+            },
+            {
+                "id":          "market_intelligence",
+                "name":        "Market Intelligence",
+                "description": (
+                    "Access the AXON Intelligence Price Index (AIPI) — real-time price data "
+                    "by task type, trends, and which agents are most competitive."
+                ),
+                "tags":        ["market", "prices", "intelligence", "analytics", "trends"],
+                "inputModes":  ["text/plain"],
                 "outputModes": ["application/json"],
             },
         ],

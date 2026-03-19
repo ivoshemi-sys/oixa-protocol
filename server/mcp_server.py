@@ -21,15 +21,18 @@ Two run modes:
   2. SSE (remote agents via HTTP) — mounted at /mcp/sse in main FastAPI app
 
 Tools exposed:
-  axon_list_auctions    — find work to bid on
-  axon_get_auction      — full auction details
-  axon_create_auction   — post a task (RFI)
-  axon_place_bid        — bid on a task to earn USDC
-  axon_register_offer   — register agent capabilities
-  axon_deliver_output   — submit completed work → triggers payment
-  axon_check_earnings   — view USDC earnings ledger
-  axon_market_prices    — AXON Intelligence Price Index
-  axon_protocol_status  — server health and escrow mode
+  axon_list_auctions      — find work to bid on
+  axon_get_auction        — full auction details
+  axon_create_auction     — post a task (RFI)
+  axon_place_bid          — bid on a task to earn USDC
+  axon_register_offer     — register agent capabilities
+  axon_deliver_output     — submit completed work → triggers payment
+  axon_check_earnings     — view USDC earnings ledger
+  axon_market_prices      — AXON Intelligence Price Index
+  axon_protocol_status    — server health and escrow mode
+  axon_find_spot_compute  — find spot agents to hire instantly (delegation, low tokens)
+  axon_list_spot_capacity — sell idle capacity on spot market (earn passively)
+  axon_spot_market        — real-time spot market overview with surge pricing
 """
 
 import asyncio
@@ -252,6 +255,72 @@ TOOLS = [
             "properties": {},
         },
     },
+    {
+        "name": "axon_find_spot_compute",
+        "description": (
+            "Find agents on the AXON spot compute market available for IMMEDIATE hire. "
+            "Use this when you are running low on API tokens, need burst capacity, "
+            "want to delegate a subtask to a specialist, or need the cheapest available agent right now. "
+            "Returns listings with real-time surge-adjusted prices. "
+            "Keywords: spot compute, delegate now, hire instantly, running low on tokens, "
+            "burst capacity, find cheapest agent, outsource subtask, emergency compute, "
+            "token budget running out, need more capacity, auto-delegate."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "capability": {
+                    "type": "string",
+                    "description": "What you need e.g. 'code_review', 'summarization', 'research', 'text_analysis'",
+                },
+                "max_price_usdc": {
+                    "type": "number",
+                    "description": "Maximum USDC per task you're willing to pay (surge pricing applies)",
+                    "default": 1.0,
+                },
+            },
+            "required": ["capability"],
+        },
+    },
+    {
+        "name": "axon_list_spot_capacity",
+        "description": (
+            "List your idle compute capacity on the AXON spot market to earn USDC passively. "
+            "Other agents will hire you immediately when they need your capabilities. "
+            "Surge pricing automatically increases your rate during peak hours. "
+            "Keywords: sell idle compute, earn passive USDC, spot market, monetize idle time, "
+            "list capacity, earn while not working, passive income, spot instance seller."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "agent_id":        {"type": "string", "description": "Your agent ID"},
+                "agent_name":      {"type": "string", "description": "Your display name"},
+                "capabilities":    {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "Your capabilities e.g. ['code_review', 'summarization']",
+                },
+                "base_price_usdc": {"type": "number", "description": "Base USDC per task (surge applied on top)"},
+                "max_tasks":       {"type": "integer", "description": "Max concurrent tasks", "default": 1},
+            },
+            "required": ["agent_id", "agent_name", "capabilities", "base_price_usdc"],
+        },
+    },
+    {
+        "name": "axon_spot_market",
+        "description": (
+            "Get real-time AXON spot compute market overview: surge pricing, supply, demand, "
+            "cheapest available agents by capability. "
+            "Use this to decide: should you hire now or wait for off-peak? "
+            "Should you list your capacity now to earn more? "
+            "Keywords: market overview, surge pricing, supply demand, spot compute, peak hours."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {},
+        },
+    },
 ]
 
 
@@ -324,6 +393,17 @@ async def handle_tool_call(name: str, arguments: dict) -> str:
 
         elif name == "axon_protocol_status":
             result = await call_axon("GET", "/health")
+
+        elif name == "axon_find_spot_compute":
+            capability     = arguments.get("capability", "")
+            max_price_usdc = arguments.get("max_price_usdc", 1.0)
+            result = await call_axon("GET", f"/api/v1/spot/capacity?capability={capability}&max_price={max_price_usdc}")
+
+        elif name == "axon_list_spot_capacity":
+            result = await call_axon("POST", "/api/v1/spot/capacity", arguments)
+
+        elif name == "axon_spot_market":
+            result = await call_axon("GET", "/api/v1/spot/market")
 
         else:
             result = {"error": f"Unknown tool: {name}"}
