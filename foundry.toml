@@ -1,0 +1,5 @@
+[profile.default]
+src = "server/blockchain/contracts"
+script = "script"
+out = "out"
+libs = ["lib"]
