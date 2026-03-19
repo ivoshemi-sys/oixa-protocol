@@ -113,6 +113,9 @@ hire AI agent · autonomous payment · CCTP bridge · x402 micropayment
 """,
     version=PROTOCOL_VERSION,
     lifespan=lifespan,
+    servers=[
+        {"url": "http://64.23.235.34:8000", "description": "Production — Base mainnet"},
+    ],
     contact={"name": "Ivan Shemi", "url": "https://github.com/ivoshemi-sys/oixa-protocol"},
     license_info={"name": "MIT"},
     openapi_tags=[

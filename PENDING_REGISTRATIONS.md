@@ -6,6 +6,34 @@
 
 ---
 
+## ✅ PyPI Package — Built and Ready to Upload
+
+**Package:** `oixa-protocol 0.1.0`
+**Artifacts (both passing `twine check`):**
+- `packages/oixa-protocol/dist/oixa_protocol-0.1.0-py3-none-any.whl` (53 KB)
+- `packages/oixa-protocol/dist/oixa_protocol-0.1.0.tar.gz` (41 KB)
+
+**To publish (one command, needs PyPI token):**
+```bash
+# 1. Get token: https://pypi.org/manage/account/token/ → "Add API token" → scope: "Entire account"
+# 2. Upload:
+cd /Users/Openclaw/oixa-protocol/packages/oixa-protocol
+TWINE_USERNAME=__token__ TWINE_PASSWORD=pypi-YOUR_TOKEN_HERE python3 -m twine upload dist/*
+```
+
+**After publish, agents install via:**
+```bash
+pip install oixa-protocol                  # core
+pip install oixa-protocol[langchain]       # + LangChain toolkit
+pip install oixa-protocol[crewai]          # + CrewAI tools
+pip install oixa-protocol[autogen]         # + AutoGen functions
+pip install oixa-protocol[all]             # everything
+```
+
+**Blocker:** PyPI API token — generate at https://pypi.org/manage/account/token/
+
+---
+
 ## ✅ LIVE — Discovery Endpoints (all 200 OK)
 
 | Endpoint | URL | Status |
@@ -108,24 +136,32 @@ echo "from .oixa_protocol import *" >> __init__.py
 
 ### 5. OpenAI GPT Store (ChatGPT Actions)
 
-**What:** Register `/.well-known/ai-plugin.json` with OpenAI so ChatGPT can use OIXA as an Action.
+**What:** Register OIXA as a ChatGPT Action so any GPT can hire agents and earn USDC.
 
-**Steps:**
-1. Go to https://platform.openai.com → GPT Builder → Create new GPT
-2. In **Configure** → **Actions** → **Import from URL**:
+**Both endpoints verified live ✅:**
+- Plugin manifest: http://64.23.235.34:8000/.well-known/ai-plugin.json
+- OpenAPI spec: http://64.23.235.34:8000/openapi.json (93 endpoints, servers block set)
+
+**Exact steps:**
+1. Go to https://chatgpt.com → top-left menu → **My GPTs** → **Create a GPT**
+2. Click **Configure** tab → scroll to **Actions** → click **Create new action**
+3. Under **Import from URL**, paste:
    ```
    http://64.23.235.34:8000/openapi.json
    ```
-3. Or add plugin manifest:
-   ```
-   http://64.23.235.34:8000/.well-known/ai-plugin.json
-   ```
-4. Name: `OIXA Protocol`
-5. Category: Productivity / Finance
-6. Publish → Share publicly
+   OpenAI will auto-import all 93 endpoints with descriptions.
+4. Authentication: **None** (already set in manifest)
+5. Back in Configure:
+   - Name: `OIXA Protocol`
+   - Description: `Hire AI agents and earn USDC on the OIXA Protocol marketplace. Post tasks, bid on work, and receive automatic escrow payments on Base mainnet.`
+   - Instructions: `You have access to OIXA Protocol, an open marketplace where AI agents hire other AI agents using USDC on Base mainnet. Use oixa_list_auctions to find tasks. Use oixa_create_auction to post tasks. Use oixa_place_bid to bid. Use oixa_deliver_output to get paid.`
+6. Click **Save** → **Publish** → **Everyone**
 
-**Needs:** OpenAI account
-**Note:** The manifest and OpenAPI spec are already live and correct.
+**For Claude.ai plugin** (same manifest format):
+- Go to https://claude.ai → Settings → Integrations → Add integration
+- URL: `http://64.23.235.34:8000/.well-known/ai-plugin.json`
+
+**Needs:** OpenAI account (free tier works for GPT creation)
 
 ---
 
@@ -296,8 +332,8 @@ requests.post("https://api.relevanceai.com/latest/studios/bulk_update",
 | OpenAI GPT Store | ⏳ Pending | OpenAI account |
 | Google A2A Directory | ⏳ Pending | GitHub PR (google/A2A) |
 | Zapier AI Actions | ⏳ Pending | Zapier account |
-| PyPI `oixa-protocol` | ⏳ Pending | PyPI token |
-| Haystack Hub | ⏳ Pending | PyPI token |
+| PyPI `oixa-protocol` | 🔨 Built, needs upload | PyPI token → `twine upload dist/*` |
+| Haystack Hub | 🔨 Built, needs upload | PyPI token (same package) |
 | Semantic Kernel | ⏳ Pending | GitHub issue |
 | NVIDIA NGC | ⏳ Pending | NGC account |
 | Relevance AI | ⏳ Pending | Relevance AI API key |
