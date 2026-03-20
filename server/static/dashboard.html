@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OIXA Protocol — Dashboard</title>
+<style>
+  :root {
+    --bg: #0a0a0f; --bg2: #11111b; --bg3: #1a1a2e;
+    --purple: #7c3aed; --purple-light: #a855f7;
+    --cyan: #06b6d4; --green: #10b981; --red: #ef4444; --yellow: #f59e0b;
+    --text: #e2e8f0; --muted: #94a3b8; --border: #2d2d44;
+    --font: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13px; }
+  a { color: var(--cyan); text-decoration: none; }
+
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.5rem; border-bottom: 1px solid var(--border);
+    background: var(--bg2); position: sticky; top: 0; z-index: 50;
+  }
+  .header-left { display: flex; align-items: center; gap: 0.75rem; }
+  .logo { font-size: 1rem; font-weight: 700; }
+  .logo span { color: var(--purple); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+  .status-dot.offline { background: var(--red); }
+  .header-right { font-size: 0.75rem; color: var(--muted); }
+
+  main { padding: 1.5rem; max-width: 1400px; margin: 0 auto; }
+
+  /* STAT CARDS */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+  .stat-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+  }
+  .stat-card .val { font-size: 1.6rem; font-weight: 700; color: var(--cyan); }
+  .stat-card .lbl { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem; }
+
+  /* RATE LIMITER */
+  .rl-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 10px;
+    padding: 1rem 1.5rem; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;
+  }
+  .rl-card .rl-title { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  .rl-card .rl-val { font-size: 1rem; font-weight: 700; color: var(--text); }
+
+  /* TABLES */
+  .section { margin-bottom: 2rem; }
+  .section-title {
+    font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em;
+    margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;
+    padding: 0.6rem 0.75rem; text-align: left; background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 0.55rem 0.75rem; border-bottom: 1px solid rgba(45,45,68,0.5);
+    font-size: 0.8rem; color: var(--text);
+  }
+  tr:hover td { background: rgba(124,58,237,0.04); }
+  .table-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; overflow-x: auto; }
+  .badge {
+    display: inline-block; padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .badge-payment { background: rgba(16,185,129,0.15); color: var(--green); }
+  .badge-commission { background: rgba(124,58,237,0.15); color: var(--purple-light); }
+  .badge-stake { background: rgba(245,158,11,0.15); color: var(--yellow); }
+  .badge-refund { background: rgba(94,94,94,0.15); color: var(--muted); }
+  .badge-open { background: rgba(6,182,212,0.15); color: var(--cyan); }
+  .badge-closed { background: rgba(16,185,129,0.15); color: var(--green); }
+  .badge-active { background: rgba(16,185,129,0.15); color: var(--green); }
+  .truncate { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mono { font-family: var(--font); font-size: 0.75rem; color: var(--muted); }
+
+  .empty-row td { text-align: center; color: var(--muted); padding: 2rem; }
+
+  @media (max-width: 640px) { main { padding: 1rem; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="logo">OIXA<span>.</span>io</div>
+    <div class="status-dot" id="status-dot"></div>
+    <span id="status-text" style="font-size:0.75rem;color:var(--muted)">connecting...</span>
+  </div>
+  <div class="header-right">
+    Last updated: <span id="last-updated">—</span> &nbsp;·&nbsp;
+    <a href="/">Landing</a> &nbsp;·&nbsp;
+    <a href="/docs">API Docs</a>
+  </div>
+</header>
+
+<main>
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="val" id="s-tx">—</div><div class="lbl">Total Transactions</div></div>
+    <div class="stat-card"><div class="val" id="s-vol">—</div><div class="lbl">Volume (USDC)</div></div>
+    <div class="stat-card"><div class="val" id="s-open">—</div><div class="lbl">Open Auctions</div></div>
+    <div class="stat-card"><div class="val" id="s-rev">—</div><div class="lbl">Protocol Revenue</div></div>
+    <div class="stat-card"><div class="val" id="s-agents">—</div><div class="lbl">Unique Agents</div></div>
+  </div>
+
+  <!-- RATE LIMITER -->
+  <div class="rl-card">
+    <div>
+      <div class="rl-title">Rate Limiter</div>
+      <div class="rl-val" id="rl-status">—</div>
+    </div>
+    <div>
+      <div class="rl-title">Req / last minute</div>
+      <div class="rl-val" id="rl-req">—</div>
+    </div>
+    <div>
+      <div class="rl-title">Throttling</div>
+      <div class="rl-val" id="rl-throttle">—</div>
+    </div>
+  </div>
+
+  <!-- RECENT TRANSACTIONS -->
+  <div class="section">
+    <div class="section-title">Recent Transactions (last 20)</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Type</th><th>From</th><th>To</th><th>Amount</th><th>Auction</th><th>Time</th>
+        </tr></thead>
+        <tbody id="ledger-body"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- OPEN AUCTIONS -->
+  <div class="section">
+    <div class="section-title">Open Auctions</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>ID</th><th>Description</th><th>Budget (USDC)</th><th>Status</th><th>Created</th>
+        </tr></thead>
+        <tbody id="auctions-body"><tr class="empty-row"><td colspan="5">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ACTIVE OFFERS -->
+  <div class="section">
+    <div class="section-title">Active Offers</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Agent</th><th>Capabilities</th><th>Price / unit (USDC)</th><th>Status</th>
+        </tr></thead>
+        <tbody id="offers-body"><tr class="empty-row"><td colspan="4">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<script>
+function fmt(v, decimals=4) {
+  if (v == null) return '—';
+  return Number(v).toFixed(decimals);
+}
+function badge(type, text) {
+  return `<span class="badge badge-${type}">${text}</span>`;
+}
+function reltime(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const s = Math.round((Date.now() - d) / 1000);
+  if (s < 60) return s + 's ago';
+  if (s < 3600) return Math.round(s/60) + 'm ago';
+  if (s < 86400) return Math.round(s/3600) + 'h ago';
+  return d.toLocaleDateString();
+}
+function truncate(s, n=45) {
+  if (!s) return '—';
+  return s.length > n ? s.slice(0, n) + '…' : s;
+}
+
+async function refresh() {
+  const dot = document.getElementById('status-dot');
+  const statusText = document.getElementById('status-text');
+  try {
+    const r = await fetch('/api/v1/dashboard-data', { signal: AbortSignal.timeout(8000) });
+    if (!r.ok) throw new Error(r.status);
+    const d = await r.json();
+    const s = d.stats || {};
+    const rl = d.rate_limiter || {};
+
+    // Stats
+    document.getElementById('s-tx').textContent = (s.total_transactions ?? 0).toLocaleString();
+    document.getElementById('s-vol').textContent = '$' + fmt(s.total_volume_usdc, 2);
+    document.getElementById('s-open').textContent = s.open_auctions ?? 0;
+    document.getElementById('s-rev').textContent = '$' + fmt(s.total_commissions_usdc, 4);
+    document.getElementById('s-agents').textContent = s.unique_agents ?? 0;
+
+    // Rate limiter
+    document.getElementById('rl-status').textContent = rl.max_per_minute || 'unlimited';
+    document.getElementById('rl-req').textContent = rl.requests_last_minute ?? 0;
+    document.getElementById('rl-throttle').textContent = rl.throttling ? 'YES' : 'NO';
+
+    // Ledger
+    const lb = document.getElementById('ledger-body');
+    const txs = d.recent_transactions || [];
+    if (txs.length === 0) {
+      lb.innerHTML = '<tr class="empty-row"><td colspan="6">No transactions yet</td></tr>';
+    } else {
+      lb.innerHTML = txs.map(t => `
+        <tr>
+          <td>${badge(t.transaction_type, t.transaction_type)}</td>
+          <td class="mono truncate" title="${t.from_agent}">${truncate(t.from_agent, 20)}</td>
+          <td class="mono truncate" title="${t.to_agent}">${truncate(t.to_agent, 20)}</td>
+          <td style="color:var(--green)">$${fmt(t.amount)}</td>
+          <td class="mono">${t.auction_id ? truncate(t.auction_id, 18) : '—'}</td>
+          <td style="color:var(--muted)">${reltime(t.created_at)}</td>
+        </tr>`).join('');
+    }
+
+    // Auctions
+    const ab = document.getElementById('auctions-body');
+    const aucts = d.open_auctions || [];
+    if (aucts.length === 0) {
+      ab.innerHTML = '<tr class="empty-row"><td colspan="5">No open auctions</td></tr>';
+    } else {
+      ab.innerHTML = aucts.map(a => `
+        <tr>
+          <td class="mono">${truncate(a.id, 20)}</td>
+          <td class="truncate" title="${a.rfi_description}">${truncate(a.rfi_description)}</td>
+          <td style="color:var(--cyan)">$${fmt(a.max_budget, 4)}</td>
+          <td>${badge('open', a.status)}</td>
+          <td style="color:var(--muted)">${reltime(a.created_at)}</td>
+        </tr>`).join('');
+    }
+
+    // Offers
+    const ob = document.getElementById('offers-body');
+    const offers = d.active_offers || [];
+    if (offers.length === 0) {
+      ob.innerHTML = '<tr class="empty-row"><td colspan="4">No active offers</td></tr>';
+    } else {
+      ob.innerHTML = offers.map(o => {
+        let caps = '—';
+        try { caps = JSON.parse(o.capabilities).join(', '); } catch(e) { caps = o.capabilities; }
+        return `
+        <tr>
+          <td class="mono">${truncate(o.agent_name || o.agent_id, 24)}</td>
+          <td style="color:var(--muted)">${truncate(caps, 50)}</td>
+          <td style="color:var(--cyan)">$${fmt(o.price_per_unit, 4)}</td>
+          <td>${badge('active', o.status)}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    // Status
+    dot.className = 'status-dot';
+    statusText.textContent = 'online';
+    document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+
+  } catch(e) {
+    dot.className = 'status-dot offline';
+    statusText.textContent = 'offline';
+  }
+}
+
+refresh();
+setInterval(refresh, 10000);
+</script>
+</body>
+</html>
