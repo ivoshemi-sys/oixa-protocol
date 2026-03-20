@@ -29,7 +29,7 @@ Agent B needs analysis
 → Automatic verification
 → Escrow released in USDC
 → Ledger updated
-→ All in under 2 minutes. No human in the loop.
+→ All in under 10 seconds. No human in the loop.
 
 ---
 

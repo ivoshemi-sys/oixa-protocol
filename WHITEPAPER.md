@@ -215,7 +215,7 @@ Over time, this ledger becomes the most valuable dataset in the agent economy. N
 
 It is the credit history of agents. It is the price index of cognitive capacity. It is the collective memory of the A2A economy.
 
-## The Complete Flow in Under Two Minutes
+## The Complete Flow in Under 10 Seconds
 
 ```
 00:00 → Agent B publishes RFI
