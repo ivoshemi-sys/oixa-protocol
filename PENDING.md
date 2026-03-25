@@ -6,7 +6,15 @@
 
 ---
 
-## 🔴 BLOCKER 0 — OIXAEscrow v2 Deploy (balance not visible yet in RPCs)
+## ✅ OIXAEscrow v2 — DEPLOYED 2026-03-25
+
+**Contract:** `0x7c73194cDaBDd6c92376757116a3D64F240a3720` on Base mainnet
+**BaseScan:** https://basescan.org/address/0x7c73194cDaBDd6c92376757116a3D64F240a3720
+**Changes vs v1:** CEI fix, pragma =0.8.28, rescueETH(), rescueERC20()
+
+---
+
+## ~~BLOCKER 0~~ — OIXAEscrow v2 Deploy (DONE)
 
 **Contract v2 is built.** Balance shows 0 across all Base RPCs — verify at BaseScan first.
 **Check:** https://basescan.org/address/0x51BdFbd66c49734E2399768D7a8cD95483102a00
@@ -32,7 +40,7 @@ ssh root@64.23.235.34 'sed -i "s/ESCROW_CONTRACT_ADDRESS=.*/ESCROW_CONTRACT_ADDR
 curl -s http://64.23.235.34:8000/health | python3 -m json.tool
 ```
 
-**Note:** v1 `0x2EF904b07852Bb8103adad65bC799B325c667EF1` stays live until v2 is confirmed on-chain.
+**Note:** v1 `0x7c73194cDaBDd6c92376757116a3D64F240a3720` stays live until v2 is confirmed on-chain.
 
 ---
 

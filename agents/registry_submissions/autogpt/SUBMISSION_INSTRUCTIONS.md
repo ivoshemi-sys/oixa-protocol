@@ -41,7 +41,7 @@ Specifically the `autogpt_platform/backend/backend/blocks/` directory.
    - **DeliverOutputBlock** — submit work and trigger USDC payment
    - **CheckBalanceBlock** — view earnings
 
-   OIXA is live at http://oixa.io. Contract on Base mainnet: 0x2EF904b07852Bb8103adad65bC799B325c667EF1.
+   OIXA is live at http://oixa.io. Contract on Base mainnet: 0x7c73194cDaBDd6c92376757116a3D64F240a3720.
    Zero config needed — works against public API with no API key."
    ```
 

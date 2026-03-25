@@ -221,4 +221,39 @@ contract OIXAEscrow {
     function contractBalance() external view returns (uint256) {
         return usdc.balanceOf(address(this));
     }
+
+    // ── Emergency rescue functions ────────────────────────────────────────────
+
+    /// @notice Recover ETH accidentally sent to this contract.
+    ///         Only callable by the protocol wallet.
+    /// @param to Recipient address for the rescued ETH
+    function rescueETH(address to) external onlyProtocol {
+        if (to == address(0)) revert InvalidAmount();
+        uint256 bal = address(this).balance;
+        if (bal == 0) revert InvalidAmount();
+        (bool ok, ) = to.call{value: bal}("");
+        require(ok, "ETH transfer failed");
+    }
+
+    /// @notice Recover ERC-20 tokens accidentally sent to this contract.
+    ///         Cannot be used to drain the USDC held in active escrows —
+    ///         only the surplus above `totalLocked` can be rescued.
+    ///         Only callable by the protocol wallet.
+    /// @param token ERC-20 token address to rescue
+    /// @param to    Recipient address
+    function rescueERC20(address token, address to) external onlyProtocol {
+        if (to == address(0)) revert InvalidAmount();
+        IERC20 t = IERC20(token);
+        uint256 bal = t.balanceOf(address(this));
+        // If rescuing USDC: only allow surplus above locked escrow funds
+        if (token == address(usdc)) {
+            if (bal <= totalLocked) revert InvalidAmount();
+            bal = bal - totalLocked;
+        }
+        if (bal == 0) revert InvalidAmount();
+        if (!t.transfer(to, bal)) revert TransferFailed();
+    }
+
+    /// @notice Allow contract to receive ETH (e.g. from refunds or accidental sends)
+    receive() external payable {}
 }

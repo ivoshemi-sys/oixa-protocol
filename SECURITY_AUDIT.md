@@ -4,7 +4,8 @@
 **Contract:** `server/blockchain/contracts/OIXAEscrow.sol`
 **Auditor:** Automated (Slither) + Manual Review
 **Network:** Base Mainnet (chainId 8453)
-**Contract Address (v1):** 0x2EF904b07852Bb8103adad65bC799B325c667EF1 *(pending v2 redeploy — see PENDING.md)*
+**Contract Address (v1, retired):** 0x2EF904b07852Bb8103adad65bC799B325c667EF1
+**Contract Address (v2, LIVE):** 0x7c73194cDaBDd6c92376757116a3D64F240a3720 — deployed 2026-03-25 on Base mainnet
 
 ## Changes in v2 (2026-03-25)
 

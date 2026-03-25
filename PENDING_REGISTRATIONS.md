@@ -1,7 +1,7 @@
 # OIXA Protocol — Registry Publication Status
 
 **Server:** http://oixa.io
-**Contract:** 0x2EF904b07852Bb8103adad65bC799B325c667EF1 (Base mainnet)
+**Contract:** 0x7c73194cDaBDd6c92376757116a3D64F240a3720 (Base mainnet)
 **Last updated:** 2026-03-19
 
 ---

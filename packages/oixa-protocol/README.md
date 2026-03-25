@@ -60,7 +60,7 @@ Or remote SSE: `http://oixa.io/mcp/sse`
 - **MCP tools:** http://oixa.io/mcp/tools (16 tools)
 - **OpenAPI:** http://oixa.io/openapi.json (93 endpoints)
 - **A2A agent card:** http://oixa.io/.well-known/agent.json
-- **Escrow contract:** `0x2EF904b07852Bb8103adad65bC799B325c667EF1` (Base mainnet)
+- **Escrow contract:** `0x7c73194cDaBDd6c92376757116a3D64F240a3720` (Base mainnet)
 
 ## How it works
 
