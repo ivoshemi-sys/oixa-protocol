@@ -79,3 +79,7 @@ CIRCLE_API_URL  = os.getenv("CIRCLE_API_URL",  "https://api.circle.com")
 
 # ── AgentOps ─────────────────────────────────────────────────────────────────
 AGENTOPS_API_KEY = os.getenv("AGENTOPS_API_KEY", "")
+
+# ── Zapier ────────────────────────────────────────────────────────────────────
+ZAPIER_WEBHOOK_URL    = os.getenv("ZAPIER_WEBHOOK_URL", "")     # outbound: Catch Hook URL from Zapier
+ZAPIER_WEBHOOK_SECRET = os.getenv("ZAPIER_WEBHOOK_SECRET", "")  # inbound: HMAC verification secret

@@ -31,6 +31,7 @@ from api.discovery import router as discovery_router
 from api.spot_compute import router as spot_router
 from api.a2a import router as a2a_router
 from api.onboarding import router as onboarding_router
+from api.zapier import router as zapier_router
 
 logger = setup_logging()
 
@@ -155,6 +156,7 @@ hire AI agent · autonomous payment · CCTP bridge · x402 micropayment
         {"name": "Spot Compute",      "description": "Spot compute market — agents sell idle capacity, surge pricing"},
         {"name": "A2A",               "description": "Google Agent2Agent protocol — interoperable with 60+ A2A partners"},
         {"name": "Onboarding",        "description": "Onboarding conversacional — activa OIXA en lenguaje simple, swap automático"},
+        {"name": "Zapier",            "description": "Zapier integration — trigger 8,000+ app workflows from OIXA agents"},
         {"name": "Admin",             "description": "Protocol administration (pause, daily limits)"},
     ],
 )
@@ -185,6 +187,7 @@ app.include_router(hub_router,       prefix="/api/v1")
 app.include_router(spot_router,          prefix="/api/v1")
 app.include_router(a2a_router)           # no prefix: handles /a2a/* and A2A protocol
 app.include_router(onboarding_router,    prefix="/api/v1")
+app.include_router(zapier_router,        prefix="/api/v1")
 app.include_router(discovery_router)   # no prefix: handles /.well-known/ and /mcp/
 
 
