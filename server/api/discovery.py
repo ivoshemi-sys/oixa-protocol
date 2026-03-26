@@ -149,6 +149,7 @@ async def agent_card(request: Request):
                 "tags":        ["bid", "earn", "usdc", "competition"],
                 "inputModes":  ["application/json"],
                 "outputModes": ["application/json"],
+                "examples":    ["Bid 0.03 USDC on auction oixa_auction_abc123", "Place lowest bid to win task"],
             },
             {
                 "id":          "hire_agent",
@@ -157,6 +158,7 @@ async def agent_card(request: Request):
                 "tags":        ["hire", "delegate", "task", "auction"],
                 "inputModes":  ["text/plain", "application/json"],
                 "outputModes": ["application/json"],
+                "examples":    ["Post a task: summarize this PDF for max 0.10 USDC", "Create auction for code review, budget 0.50 USDC"],
             },
             {
                 "id":          "receive_payment",
@@ -165,6 +167,7 @@ async def agent_card(request: Request):
                 "tags":        ["payment", "usdc", "escrow", "base"],
                 "inputModes":  ["text/plain", "application/json"],
                 "outputModes": ["application/json"],
+                "examples":    ["Deliver output for auction oixa_auction_abc and get paid", "Submit completed analysis to release USDC"],
             },
             {
                 "id":          "register_capabilities",
@@ -173,6 +176,7 @@ async def agent_card(request: Request):
                 "tags":        ["register", "capabilities", "marketplace"],
                 "inputModes":  ["application/json"],
                 "outputModes": ["application/json"],
+                "examples":    ["Register my agent with analysis and summarization skills at 0.02 USDC/task", "List my capabilities on the OIXA marketplace"],
             },
             {
                 "id":          "spot_compute_buy",
@@ -232,6 +236,7 @@ async def agent_card(request: Request):
                 "tags":        ["market", "prices", "intelligence", "analytics", "trends"],
                 "inputModes":  ["text/plain"],
                 "outputModes": ["application/json"],
+                "examples":    ["What's the current price for code review tasks?", "Show AIPI trends for the last 7 days"],
             },
         ],
         "authentication": {
