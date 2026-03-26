@@ -35,7 +35,15 @@ jobs:
 
             echo "── Restarting service ────────────────────────"
             systemctl restart $SERVICE
-            sleep 5
+
+            echo "── Waiting for server to be healthy ──────────"
+            for i in $(seq 1 24); do
+              sleep 5
+              STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/health)
+              echo "  attempt $i: HTTP $STATUS"
+              [ "$STATUS" = "200" ] && break
+              [ "$i" = "24" ] && { echo "❌ Server did not become healthy"; exit 1; }
+            done
 
             echo "── Health check ──────────────────────────────"
             curl -sf http://localhost:8000/health | python3 -m json.tool
